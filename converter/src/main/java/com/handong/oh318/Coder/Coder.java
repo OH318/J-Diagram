@@ -9,5 +9,6 @@ class Coder {
     private String directoryPath ; // entering by user 
     private ArrayList<JavaClassSource> JavaClasses ;
     private ArrayList<Lines> lines ; 
+
     
 }

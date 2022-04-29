@@ -1,4 +1,4 @@
-package com.handong.oh318;
+package com.handong.oh318.test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
