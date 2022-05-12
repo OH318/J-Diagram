@@ -3,8 +3,6 @@ package com.handong.oh318;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.handong.oh318.Extractor.Extractor;
-
 import org.jboss.forge.roaster.model.source.FieldSource;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
 import org.jboss.forge.roaster.model.source.MethodSource;
@@ -15,7 +13,7 @@ public class Main {
         Extractor extractor = new Extractor() ; 
 
         // HashMap<String, JavaClassSource> classes = 
-        ArrayList<JavaClassSource> classes = extractor.getJavaClassSources("/Users/jinil/eclipse-workspace/LFAE", ".java");
+        ArrayList<JavaClassSource> classes = extractor.getJavaClassSources("/Users/jinil/eclipse-workspace/LFAE");
 
         for (JavaClassSource jcs : classes)  {
             System.out.println("[Class]: " + jcs.getName()) ; 
