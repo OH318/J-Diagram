@@ -10,10 +10,11 @@ import org.jboss.forge.roaster.model.source.MethodSource;
 public class Main {
     
     public static void main(String[] args) {
+        
         Extractor extractor = new Extractor() ; 
 
         // HashMap<String, JavaClassSource> classes = 
-        ArrayList<JavaClassSource> classes = extractor.getJavaClassSources("/Users/jinil/eclipse-workspace/LFAE");
+        ArrayList<JavaClassSource> classes = extractor.getJavaClassSources("/Users/kimseoye/Developer/git/javapoet");
 
         for (JavaClassSource jcs : classes)  {
             System.out.println("[Class]: " + jcs.getName()) ; 

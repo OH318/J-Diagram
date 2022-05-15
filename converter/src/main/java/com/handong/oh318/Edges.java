@@ -19,9 +19,75 @@ public class Edges {
         compositionRelations, endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=1;
                                 edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;
     */
-
+    
     private Point source ; 
     private Point target ;
+
+    /**
+     * class1(source) -> class2(target)
+     * sourceClassDiagram: 
+     * targetClassDiagram: 
+     */
+    private int sourceClassDiagramId ; 
+    private int targetClassDiagramId ;
+
+    public int identifyArrow(String style) {		//if there is no arrow type,it will return -1; 
+    	int type = -1;
+    	
+    	if(style.contains("endArrow=none")) 
+		{
+			type = 3; // associations
+		}
+		else if(style.contains("endArrow=block")) 
+		{
+			if(style.contains("dashed=1")){
+				type = 1; //realizations
+			}else {
+				type = 0; //generalizations
+			}
+		}
+		else if(style.contains("endArrow=open")) 
+		{
+			if(style.contains("startFill=0")) {
+				type = 6;//aggregationRelations
+			}else if(style.contains("startFill=1")) {
+				type = 8;//compositionRelations
+			}else if(style.contains("dashed=1")) {
+				type = 2;//dependancies
+			}else {
+				type = 4;//directedAssociations
+			}
+		}
+		else if(style.contains("endArrow=diamondThin")) 
+		{
+			if(style.contains("endFill=0")) 
+			{
+				type = 5;//aggregations
+			}
+			else if(style.contains("endFill=1")) 
+			{
+				type = 7 ;//compositions
+			}
+		}
+    	
+    	return arrowType;
+    }
+
+    public void setSourceClassDiagramId(int sourceClassDiagramId) { 
+        this.sourceClassDiagramId = sourceClassDiagramId ; 
+    }
+
+    public int getSourceClassDiagramId() { 
+        return this.sourceClassDiagramId; 
+    }
+
+    public void setTargetClassDiagramId(int targetClassDiagramId)  {
+        this.targetClassDiagramId = targetClassDiagramId ; 
+    }
+
+    public int getTargetClassDiagramId() {
+        return this.targetClassDiagramId ; 
+    }
 
     public void setArrowType(int arrowType) {
         this.arrowType = arrowType ; 

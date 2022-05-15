@@ -5,6 +5,10 @@ public class Diagram {
     private int height ; 
     private Point point ;
 
+    Diagram() {
+        point = new Point() ; 
+    }
+
     public void setWidth(int width) {
         this.width = width ;
     }

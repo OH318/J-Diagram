@@ -1,4 +1,4 @@
-package com.handong.oh318.Coder;
+package com.handong.oh318;
 
 public class Point {
     
