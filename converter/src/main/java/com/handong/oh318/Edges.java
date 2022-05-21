@@ -28,8 +28,8 @@ public class Edges {
      * sourceClassDiagram: 
      * targetClassDiagram: 
      */
-    private int sourceClassDiagramId ; 
-    private int targetClassDiagramId ;
+    private String sourceClassDiagramId ; 
+    private String targetClassDiagramId ;
 
     public int identifyArrow(String style) {		//if there is no arrow type,it will return -1; 
     	int type = -1;
@@ -73,19 +73,19 @@ public class Edges {
     	return arrowType;
     }
 
-    public void setSourceClassDiagramId(int sourceClassDiagramId) { 
+    public void setSourceClassDiagramId(String sourceClassDiagramId) { 
         this.sourceClassDiagramId = sourceClassDiagramId ; 
     }
 
-    public int getSourceClassDiagramId() { 
+    public String getSourceClassDiagramId() { 
         return this.sourceClassDiagramId; 
     }
 
-    public void setTargetClassDiagramId(int targetClassDiagramId)  {
+    public void setTargetClassDiagramId(String targetClassDiagramId)  {
         this.targetClassDiagramId = targetClassDiagramId ; 
     }
 
-    public int getTargetClassDiagramId() {
+    public String getTargetClassDiagramId() {
         return this.targetClassDiagramId ; 
     }
 

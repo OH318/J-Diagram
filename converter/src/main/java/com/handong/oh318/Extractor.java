@@ -19,7 +19,7 @@ public class Extractor extends UserInput implements Parse{
 
     private ArrayList<JavaClassSource> classes; 
     private ArrayList<String> paths; 
-    private Lines lines ; 
+    // private Lines lines ; (convert ArrayList<Edges> )
     private PointGenerator pointGenerator ;
 
     public static List<Path> getJavaFilepaths(String directoryPath) throws IOException {

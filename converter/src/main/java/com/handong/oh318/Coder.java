@@ -22,16 +22,14 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 class Coder extends UserInput implements Parse{
-    private TempNameGenerator tempNameGenerator ; 
     // private ArrayList<JavaClassSource> classes ; 
     // ID, [Diagram, JavaClassSource]
-    private HashMap<Integer, CoderClassDiagram > classes ;
-    private Lines lines; 
+    private HashMap<String, CoderClassDiagram > classes ;
+    private ArrayList<Edges> lines; 
 
     public Coder() { 
-        classes = new HashMap<Integer, CoderClassDiagram>() ; 
-        tempNameGenerator = new TempNameGenerator() ; 
-        lines = new Lines() ;
+        classes = new HashMap<String, CoderClassDiagram>() ; 
+        lines = new ArrayList<Edges>() ;
     }
 
     public CoderClassDiagram createJavaClassSourceAndSetLocation(int id, Element element) {
@@ -42,7 +40,6 @@ class Coder extends UserInput implements Parse{
 
         classDiagram.setJavaClassSource(javaClassSource) ; 
         Diagram diagram = classDiagram.getDiagram() ; 
-        classes.put(id, classDiagram) ;
         
         NodeList coordinate = element.getElementsByTagName("mxGeometry");  
         if ( coordinate.getLength() != 0 ) {
@@ -79,12 +76,12 @@ class Coder extends UserInput implements Parse{
      * @throws SAXException
      */
 
-    public ArrayList<CoderClassDiagram> getDataFromXML(File drawioFile) throws IOException {
+    public void setDataFromXML(File drawioFile) throws IOException {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = null ;
         Document doc = null ; 
 
-        ArrayList<CoderClassDiagram> classDiagrams = new ArrayList<CoderClassDiagram>() ; 
+        // ArrayList<CoderClassDiagram> classDiagrams = new ArrayList<CoderClassDiagram>() ; 
 
         try {
             dBuilder = dbFactory.newDocumentBuilder();
@@ -116,6 +113,8 @@ class Coder extends UserInput implements Parse{
                 int id = Integer.parseInt(element.getAttribute("id")) ; 
                 if ( id <= 1 ) continue ;
 
+                // Diagram id 
+                
                 if(element.getAttribute("parent").compareTo("1") == 0 
                         && !element.getAttribute("style").contains("endArrow")) {
 
@@ -123,33 +122,34 @@ class Coder extends UserInput implements Parse{
                     // Create JavaClassSource & Set Location and Size
                     classDiagram = createJavaClassSourceAndSetLocation(id, element) ; 
 
-                    if ( classDiagram != null ) classDiagrams.add(classDiagram) ; 
+                    classDiagram.getDiagram().setId(element.getAttribute("id"));
+
+                    if ( classDiagram != null ) classes.put(element.getAttribute("id"), classDiagram) ;
+                    //  classDiagrams.add(classDiagram) ; 
                     continue ;
                 } else if(element.getAttribute("style").contains("endArrow")) {
                     Edges edges = new Edges() ; 
-                    // String style = element.getAttribute("style");
+                    String style = element.getAttribute("style");
 
                     if(element.getAttribute("source").length() != 0) {
-                        int sourceClassDiagramId = Integer.parseInt(element.getAttribute("source")) ;
-
                         // set source class diagram id in edges 
-                        edges.setSourceClassDiagramId(sourceClassDiagramId) ; 
+                        edges.setSourceClassDiagramId(element.getAttribute("source")) ; 
                     }
                     
                     if(element.getAttribute("target").length() != 0) {
-                        int targetClassDiagramId = Integer.parseInt(element.getAttribute("target")) ; 
-
                         // set target class diagram id in edges
-                        edges.setTargetClassDiagramId(targetClassDiagramId) ; 
+                        edges.setTargetClassDiagramId(element.getAttribute("target")) ; 
                     }
+
+                    // JavaClassSource jss = classDiagram.getJavaClassSource() ;
 
                     // Identify Arrows check line method
                     // type, source, target point?
-                    // edges.setArrowType(edges.identifyArrow(style)) ; 
+                    edges.setArrowType(edges.identifyArrow(style)) ; 
                     
                     // Q. What is better between ArrayList<Edges> without Lines class between now state?  
                     // TODO: set SourcePoint and TargetPoint 
-                    // lines.addArrow(edges.identifyArrow(style), source, target);
+                    lines.add(edges) ; 
                 } 
 
                 //identify attributes and method
@@ -159,21 +159,55 @@ class Coder extends UserInput implements Parse{
                 }
 
                 String value = element.getAttribute("value");
-                int parentId = Integer.parseInt(element.getAttribute("parent"));
+                String parentId = element.getAttribute("parent");
 
                 // TODO
                 // Q. Connection check? 
                 if ( classes.containsKey(parentId) ) {
                     String[] attrs = value.split(" ") ; 
                     
+                    if ( type == 1 ) { 
+                        
+                    }
                     CoderClassDiagram ccd = classes.get(parentId) ;
-                    ccd.addFieldAndMethodsInJavaClassSource(attrs, ccd.getJavaClassSource(), type, tempNameGenerator); 
+                    ccd.addFieldAndMethodsInJavaClassSource(attrs, ccd.getJavaClassSource(), type); 
                 }
             }   
         }
 
-    
-        return classDiagrams;
+        // TODO: Inheritance & Interface 
+        for ( String key : classes.keySet() ) { 
+            CoderClassDiagram ccd = classes.get(key) ; 
+
+            System.out.println("ID: " +key) ; 
+            for (int j = 0 ; j < lines.size(); j++) { 
+
+                // Start Point is child. 
+                String sourceId = lines.get(j).getSourceClassDiagramId() ;
+                
+                // Target point is parent. 
+                if ( ccd.getDiagram().getId().equals(sourceId)) { 
+                    String parentId = lines.get(j).getTargetClassDiagramId();   
+                    
+                    System.out.println(sourceId + " " +  parentId) ;
+
+                    // Arrow Type (generalization) 
+                    if ( lines.get(j).getArrowType() == 0 ) { 
+                        if ( classes.get(parentId)  == null ) {
+                            System.err.println("Debug1") ; 
+                        }
+                        else ccd.getJavaClassSource().extendSuperType(classes.get(parentId).getJavaClassSource().getClass()) ;  // ?
+                    }
+                    // Arrow Type (implementation) 
+                    else if ( lines.get(j).getArrowType() == 1) { 
+                        if ( classes.get(parentId).getJavaClassSource() == null ) {
+                            System.err.println("Debug2") ; 
+                        }
+                        ccd.getJavaClassSource().implementInterface(classes.get(parentId).getJavaClassSource().getClass()) ; // ? 
+                    }
+                }   
+            }
+        }
     }
 
     /**
@@ -188,7 +222,7 @@ class Coder extends UserInput implements Parse{
     @Override
     public ArrayList<JavaClassSource> getJavaClassSources(String path)  {
         // TODO 
-
+        
         return null ;
     }
 
@@ -200,24 +234,28 @@ class Coder extends UserInput implements Parse{
      *      If Java files is created, it returns true. 
      *      Otherwise, it returns false ; 
      */
-    public boolean createSourceCodes(String path) { 
+    public boolean createSourceCodes(String javaPath, String drawioPath) { 
         
         /**
          * TODO:
          *      We should be entered by user for parsing drawio file and making directory.  
          */
-        File file = new File("/Users/jinil/Desktop/Drawio/car.drawio") ; 
-        ArrayList<CoderClassDiagram> classDiagrams = null ; 
-        try {
-            classDiagrams = getDataFromXML(file) ;
+        // "/Users/jinil/Desktop/Drawio/car.drawio"
+        File file = new File(drawioPath) ; 
 
-            for (CoderClassDiagram ccd : classDiagrams) { 
-                //output to file
-                
+        try {
+            setDataFromXML(file) ;
+
+            if ( classes == null ) { 
+                return false ; 
+            } 
+
+            for (String id : classes.keySet()) { 
+                CoderClassDiagram ccd = classes.get(id) ;
                 try {
                     JavaClassSource javaClass = ccd.getJavaClassSource() ; 
                     String className = javaClass.getName() ; 
-                    String classPath = String.format("%s/%s.java", path, className); 
+                    String classPath = String.format("%s/%s.java", javaPath, className); 
                     
                     //check if any syntax error
                     if(javaClass != null && javaClass.hasSyntaxErrors()){
@@ -225,22 +263,19 @@ class Coder extends UserInput implements Parse{
                         continue ; 
                     }
 
-                    FileUtils.forceMkdir(new File(path));
+                    FileUtils.forceMkdir(new File(javaPath));
                     writeStringToFile(new File(classPath), javaClass.toString(), Charset.defaultCharset(), false);
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     System.out.println("IOException: "); 
                 }
-            }
+            }   
+
         } catch (IOException e) {
             // TODO Auto-generated catch block
             System.out.println("IOException: cannot get the data from XML"); 
         } 
 
-        if ( classDiagrams == null ) { 
-            return false ; 
-        } else { 
-            return true ;  
-        }
+        return true; 
     }
 }

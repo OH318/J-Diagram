@@ -1,6 +1,9 @@
 package com.handong.oh318;
 
+import java.util.HashMap;
+
 import org.jboss.forge.roaster.model.source.JavaClassSource;
+import org.jboss.forge.roaster.model.source.MethodSource;
 
 public class CoderClassDiagram {
     
@@ -34,8 +37,9 @@ public class CoderClassDiagram {
      * @param type
      *      ex) 0: field, 1: method
      */
-    public void addFieldAndMethodsInJavaClassSource(String[] attr, JavaClassSource javaClassSource, int type, TempNameGenerator tempNameGenerator) {
-        String[] paramTypes = null ;
+    public void addFieldAndMethodsInJavaClassSource(String[] attr, JavaClassSource javaClassSource, int type) {
+        // String[] paramTypes = null ;
+        HashMap<String, String> paramTypes = null ; 
         accessModifierType accessModifier = accessModifierType.Private ; // private: 0, protected: 1, public: 2
 
         if ( attr.length != 3 ) return ; 
@@ -60,7 +64,8 @@ public class CoderClassDiagram {
         }
 
         /**
-         * Field, Method
+         * Field (=0), Method(=1)
+         * Get the name from attr
          */
         if ( type == 0 ) { 
             // Remove ":" on the field name for getting an original field name. 
@@ -74,15 +79,14 @@ public class CoderClassDiagram {
                 
 				String[] tempParamTypes = attr[1].substring(attr[1].indexOf("(") + 1, attr[1].indexOf(")")).split(",");
                 
-                // Parameter should be composed to (DataType, ParameterName). 
-                // Thus, we should multiple twice to the length of paramTypes String array. 
-                paramTypes = new String[tempParamTypes.length * 2] ; 
-                for (int i = 0 ; i < tempParamTypes.length; i++) {
-                    paramTypes[i] = tempParamTypes[i].trim(); 
+                // Parameter should be composed to (ParameterName, DataType). 
+                // Thus, we should create the instance of paramTypes String HashMap. 
 
-                    // TODO: it should be changed to the code as tempNameGenerator.genearateParamName() ;  
-                    String tempName = "param"; 
-                    paramTypes[i + 1] = tempName.concat(Integer.toString(i)) ;  // tempNameGenerator.genearateParamName() ; 
+                paramTypes = new HashMap<String,String>() ; 
+                String tempName = "param"; 
+                for (int i = 0 ; i < tempParamTypes.length; i++) {
+                    // param name, param data type
+                    paramTypes.put(tempName.concat(Integer.toString(i)), tempParamTypes[i].trim() );
                 }
 			}
 			
@@ -123,11 +127,29 @@ public class CoderClassDiagram {
 
             if ( paramTypes != null ) { 
                 if ( accessModifier == accessModifierType.Private ) { 
-                    javaClassSource.addMethod().setName(attr[1]).setReturnType(attr[2]).setPrivate().addParameter("int", "test1") ; 
+                    MethodSource<JavaClassSource> privateMethod = javaClassSource.addMethod().setName(attr[1]).setReturnType(attr[2]).setPrivate() ; 
+                    
+                    if ( paramTypes != null ) {
+                        for (String paramName :  paramTypes.keySet() ) {
+                            privateMethod.addParameter(paramTypes.get(paramName), paramName) ; 
+                        }
+                    }
                 } else if ( accessModifier == accessModifierType.Protected ) { 
-                    javaClassSource.addMethod().setName(attr[1]).setReturnType(attr[2]).setProtected().addParameter("int", "test1") ; 
+                    MethodSource<JavaClassSource> protectedMethod = javaClassSource.addMethod().setName(attr[1]).setReturnType(attr[2]).setProtected(); 
+                    
+                    if ( paramTypes != null ) { 
+                        for (String paramName :  paramTypes.keySet() ) {
+                            protectedMethod.addParameter(paramTypes.get(paramName), paramName) ; 
+                        } 
+                    }
                 } else if ( accessModifier == accessModifierType.Public ) { 
-                    javaClassSource.addMethod().setName(attr[1]).setReturnType(attr[2]).setPublic().addParameter("int", "test1") ; 
+                    MethodSource<JavaClassSource> publicMethod = javaClassSource.addMethod().setName(attr[1]).setReturnType(attr[2]).setPublic(); 
+                    
+                    if ( paramTypes != null ) {
+                        for (String paramName :  paramTypes.keySet() ) {
+                            publicMethod.addParameter(paramTypes.get(paramName), paramName) ; 
+                        } 
+                    }
                 }
             } else { 
                 if ( accessModifier == accessModifierType.Private ) { 
