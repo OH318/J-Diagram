@@ -2,8 +2,10 @@ package com.handong.oh318;
 
 import java.util.HashMap;
 
+import org.jboss.forge.roaster.model.source.FieldSource;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
 import org.jboss.forge.roaster.model.source.MethodSource;
+import org.w3c.dom.Element;
 
 public class CoderClassDiagram {
     
@@ -37,12 +39,10 @@ public class CoderClassDiagram {
      * @param type
      *      ex) 0: field, 1: method
      */
-    public void addFieldAndMethodsInJavaClassSource(String[] attr, JavaClassSource javaClassSource, int type) {
+    public void addFieldAndMethodsInJavaClassSource(String[] attr, JavaClassSource javaClassSource, int type, Element element) {
         // String[] paramTypes = null ;
         HashMap<String, String> paramTypes = null ; 
         accessModifierType accessModifier = accessModifierType.Private ; // private: 0, protected: 1, public: 2
-
-        if ( attr.length != 3 ) return ; 
 
         /**
          * Access Modifier 
@@ -62,22 +62,27 @@ public class CoderClassDiagram {
                 return ;
             }
         }
+        
+        // Remove ":" on the field name for getting an original field name. 
+        String[] temp = attr[1].trim().split(":") ; 
+        String name = temp[0] ; 
+        String dataType = attr[2] ; 
 
         /**
          * Field (=0), Method(=1)
          * Get the name from attr
          */
         if ( type == 0 ) { 
-            // Remove ":" on the field name for getting an original field name. 
-            attr[1] = attr[1].substring(0, attr[1].length() - 1 );
+            
+            name = name.trim(); 
         } else { 
             // Parsing the type of parameters on the method 
-            int paramLength = attr[1].indexOf(")") - attr[1].indexOf("(");
+            int paramLength = name.indexOf(")") - name.indexOf("(");
 		
 			if(paramLength > 1) 
 			{   
                 
-				String[] tempParamTypes = attr[1].substring(attr[1].indexOf("(") + 1, attr[1].indexOf(")")).split(",");
+				String[] tempParamTypes = name.substring(name.indexOf("(") + 1, name.indexOf(")")).split(",");
                 
                 // Parameter should be composed to (ParameterName, DataType). 
                 // Thus, we should create the instance of paramTypes String HashMap. 
@@ -91,12 +96,13 @@ public class CoderClassDiagram {
 			}
 			
             // Remove "()" on the method name for getting an original method name ; 
-			attr[1] = attr[1].substring(0, attr[1].indexOf("(") );
+			name = name.substring(0, name.indexOf("(") );
         }
 
         /**
          * TODO: 
          *      Check final variable & static
+         *      abstract method
          */
 
 
@@ -104,59 +110,105 @@ public class CoderClassDiagram {
          * Attribute
          * DataType [Field, Method] 
          * */ 
-        attr[2] = attr[2].trim() ; 
-
+        dataType = dataType.trim() ; 
+        
         // Field 
         if ( type == 0 ) {
+            System.out.println(dataType) ; 
+            FieldSource<JavaClassSource> field = null ; 
 
-            // Private 
             if ( accessModifier == accessModifierType.Private ) { 
-                javaClassSource.addField().setName(attr[1]).setType(attr[2]).setPrivate() ;
+                field = javaClassSource.addField().setName(name).setType(dataType).setPrivate() ;
             // Protected    
             } else if ( accessModifier == accessModifierType.Protected ) {
-                javaClassSource.addField().setName(attr[1]).setType(attr[2]).setProtected() ;
+                field = javaClassSource.addField().setName(name).setType(dataType).setProtected() ;
             // Public 
             } else if ( accessModifier == accessModifierType.Public ) {
-                javaClassSource.addField().setName(attr[1]).setType(attr[2]).setPublic() ;  
+                field = javaClassSource.addField().setName(name).setType(dataType).setPublic() ;  
+
+                /**
+                 *  When the data type includes final and static, and user initializes the value. 
+                 *  + DIRECTION: int = 7 => public static final int DIRECTION = 7 ; 
+                 */
+                if ( attr.length > 3) { 
+                    String initializer = ""; 
+
+                    for (int i = 2 ; i < attr.length ; i++)  {
+                        initializer += attr[i]; 
+                    }
+                    initializer = initializer.split("=")[1] ; 
+                    System.out.println("INITIAL" + initializer) ; 
+                    field.setLiteralInitializer(initializer) ; 
+                }
             }
+
+            /**
+             *  Static field (fontStyle=4 in style)
+             */
+            if ( field != null && element.getAttribute("style").contains("fontStyle=4") ) { 
+                field.setStatic(true) ; 
+            }
+
+            /**
+             *  Final (UpperCase)
+             */
+            boolean finalChecker = true; 
+            for (int i = 0 ; i < name.length() ; i++) {
+                if ( Character.isLowerCase(name.charAt(i))  ) {
+                    finalChecker = false;  
+                    break; 
+                }
+            }
+
+            // final type is all characters is composed to uppercase. 
+            if ( field != null && finalChecker )  {
+                // static 
+                if ( accessModifier == accessModifierType.Public ) field.setStatic(true) ; 
+                // non-static 
+                field.setFinal(true) ; 
+            }
+            
+
         // Method 
         } else if ( type == 1 ) { 
-            // TODO: static 
+
+            MethodSource<JavaClassSource> method = null ; 
+
+            if ( accessModifier == accessModifierType.Private ) { 
+                method = javaClassSource.addMethod().setName(name).setReturnType(dataType).setPrivate() ; 
+            } else if ( accessModifier == accessModifierType.Protected ) { 
+                method = javaClassSource.addMethod().setName(name).setReturnType(dataType).setProtected(); 
+            } else if ( accessModifier == accessModifierType.Public ) { 
+                method = javaClassSource.addMethod().setName(name).setReturnType(dataType).setPublic(); 
+            }
 
             if ( paramTypes != null ) { 
-                if ( accessModifier == accessModifierType.Private ) { 
-                    MethodSource<JavaClassSource> privateMethod = javaClassSource.addMethod().setName(attr[1]).setReturnType(attr[2]).setPrivate() ; 
-                    
-                    if ( paramTypes != null ) {
-                        for (String paramName :  paramTypes.keySet() ) {
-                            privateMethod.addParameter(paramTypes.get(paramName), paramName) ; 
-                        }
-                    }
-                } else if ( accessModifier == accessModifierType.Protected ) { 
-                    MethodSource<JavaClassSource> protectedMethod = javaClassSource.addMethod().setName(attr[1]).setReturnType(attr[2]).setProtected(); 
-                    
-                    if ( paramTypes != null ) { 
-                        for (String paramName :  paramTypes.keySet() ) {
-                            protectedMethod.addParameter(paramTypes.get(paramName), paramName) ; 
-                        } 
-                    }
-                } else if ( accessModifier == accessModifierType.Public ) { 
-                    MethodSource<JavaClassSource> publicMethod = javaClassSource.addMethod().setName(attr[1]).setReturnType(attr[2]).setPublic(); 
-                    
-                    if ( paramTypes != null ) {
-                        for (String paramName :  paramTypes.keySet() ) {
-                            publicMethod.addParameter(paramTypes.get(paramName), paramName) ; 
-                        } 
-                    }
+                for (String paramName :  paramTypes.keySet() ) {
+                    method.addParameter(paramTypes.get(paramName), paramName) ; 
                 }
-            } else { 
-                if ( accessModifier == accessModifierType.Private ) { 
-                    javaClassSource.addMethod().setName(attr[1]).setReturnType(attr[2]).setPrivate() ; 
-                } else if ( accessModifier == accessModifierType.Protected ) { 
-                    javaClassSource.addMethod().setName(attr[1]).setReturnType(attr[2]).setProtected() ; 
-                } else if ( accessModifier == accessModifierType.Public ) { 
-                    javaClassSource.addMethod().setName(attr[1]).setReturnType(attr[2]).setPublic() ; 
+            } 
+
+            /**
+             *  Static method (fontStyle=4 in style)
+             */
+            if ( method != null && element.getAttribute("style").contains("fontStyle=4") ) {
+                method.setStatic(true) ; 
+            }
+
+            /**
+             *  Final (UpperCase)
+             */
+            boolean finalChecker = true; 
+            for (int i = 0 ; i < name.length() ; i++) {
+                if ( Character.isLowerCase(name.charAt(i))  ) {
+                    finalChecker = false;  
+                    break; 
                 }
+            }
+
+            // All characters is composed to uppercase. 
+            if ( method != null && finalChecker )  {
+                method.setFinal(true) ; 
             }
         } 
     }

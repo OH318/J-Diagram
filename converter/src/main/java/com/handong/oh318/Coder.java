@@ -107,13 +107,14 @@ class Coder extends UserInput implements Parse{
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) node;
 
+                // Diagram id 
                 int id = Integer.parseInt(element.getAttribute("id")) ; 
                 if ( id <= 1 ) continue ;
 
-                // Diagram id 
                 
-                if(element.getAttribute("parent").compareTo("1") == 0 
-                        && !element.getAttribute("style").contains("endArrow")) {
+                // Class name
+                if( element.getAttribute("parent").compareTo("1") == 0 
+                        && !element.getAttribute("style").contains("endArrow") ) {
 
                     type = 0 ; 
                     // Create JavaClassSource & Set Location and Size
@@ -122,18 +123,19 @@ class Coder extends UserInput implements Parse{
                     classDiagram.getDiagram().setId(element.getAttribute("id"));
 
                     if ( classDiagram != null ) classes.put(element.getAttribute("id"), classDiagram) ;
-                    //  classDiagrams.add(classDiagram) ; 
                     continue ;
-                } else if(element.getAttribute("style").contains("endArrow")) {
+
+                // Arrow 
+                } else if( element.getAttribute("style").contains("endArrow") ) {
                     Edges edges = new Edges() ; 
                     String style = element.getAttribute("style");
 
-                    if(element.getAttribute("source").length() != 0) {
+                    if( element.getAttribute("source").length() != 0 ) {
                         // set source class diagram id in edges 
                         edges.setSourceClassDiagramId(element.getAttribute("source")) ; 
                     }
                     
-                    if(element.getAttribute("target").length() != 0) {
+                    if( element.getAttribute("target").length() != 0 ) {
                         // set target class diagram id in edges
                         edges.setTargetClassDiagramId(element.getAttribute("target")) ; 
                     }
@@ -143,12 +145,14 @@ class Coder extends UserInput implements Parse{
                     edges.setArrowType(edges.identifyArrow(style)) ; 
                     
                     setPointsOfEdges(element, edges); 
-                    // Q. What is better between ArrayList<Edges> without Lines class between now state?  
-                    // TODO: set SourcePoint and TargetPoint 
+                    
                     lines.add(edges) ; 
                 } 
 
-                //identify attributes and method
+                // final (all characters is uppercase and split words to _ character)
+                
+                // Identify attributes and method
+                // If the line is met, next attribute is method part. 
                 if(element.getAttribute("style").contains("line")) {
                     type = 1 ;
                     continue ; 
@@ -161,7 +165,7 @@ class Coder extends UserInput implements Parse{
                     String[] attrs = value.split(" ") ; 
 
                     CoderClassDiagram ccd = classes.get(parentId) ;
-                    ccd.addFieldAndMethodsInJavaClassSource(attrs, ccd.getJavaClassSource(), type); 
+                    ccd.addFieldAndMethodsInJavaClassSource(attrs, ccd.getJavaClassSource(), type, element); 
                 }
             }   
         }
