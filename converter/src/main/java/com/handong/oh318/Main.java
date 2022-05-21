@@ -11,28 +11,31 @@ public class Main {
     
     public static void main(String[] args) {
         
-        Extractor extractor = new Extractor() ; 
-
+        Extractor extractor = new Extractor( "C:\\JAVA\\test22.drawio", "C:\\JAVA\\Test") ; 
+ //       Extractor extractor = new Extractor() ; 
+    	 
+        System.out.println("zzzz");
         // HashMap<String, JavaClassSource> classes = 
-        ArrayList<JavaClassSource> classes = extractor.getJavaClassSources("/Users/kimseoye/Developer/git/javapoet");
-
-        for (JavaClassSource jcs : classes)  {
-            System.out.println("[Class]: " + jcs.getName()) ; 
+        ArrayList<ClassBox> classes = extractor.getJavaClassSources(".java");
+        		
+        for (ClassBox jcs : classes)  {
+            System.out.println("[Class]: " + jcs.src.getName()) ; 
             
-            List<FieldSource<JavaClassSource>> fieldList = jcs.getFields() ; 
+            List<FieldSource<JavaClassSource>> fieldList = jcs.src.getFields() ; 
 
             System.out.println("[Fields names]") ; 
             for (FieldSource<JavaClassSource> f : fieldList) { 
                 System.out.println(f.getVisibility().name() + " " + f.getType() + " " +  f.getName()) ;
             }
 
-            List<MethodSource<JavaClassSource>> methodLists = jcs.getMethods() ;
+            List<MethodSource<JavaClassSource>> methodLists = jcs.src.getMethods() ;
             System.out.println("[Method names]") ; 
             for (MethodSource<JavaClassSource> m : methodLists ){ 
                 System.out.println(m.getVisibility().name() + " " + m.getName()) ;
             }
         }   
         
+        extractor.createDrawio();
         // for (String path : classes.keySet()) {
         //     System.out.println("[FilePath]: " + path) ; 
             
