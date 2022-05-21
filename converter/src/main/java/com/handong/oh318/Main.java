@@ -12,9 +12,9 @@ public class Main {
         // Extractor
         if ( args[2].equals("0") ) {
 
-
         // Coder
         } else if ( args[2].equals("1")) { 
+            System.out.println("[Coder]") ; 
             Coder coder = new Coder() ; 
 
             boolean success = coder.createSourceCodes(javaPath, drawioPath) ; 

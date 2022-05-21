@@ -1,10 +1,9 @@
 package com.handong.oh318;
 
 public class Diagram {
-    private String id ; 
-    private String lastMethodId; 
-    private int width ; 
-    private int height ; 
+    private String id ;
+    private float width ; 
+    private float height ; 
     private Point point ;
 
     Diagram() {
@@ -19,19 +18,19 @@ public class Diagram {
         return this.id ; 
     }
 
-    public void setWidth(int width) {
+    public void setWidth(float width) {
         this.width = width ;
     }
 
-    public int getWidth() { 
+    public float getWidth() { 
         return this.width ; 
     }
 
-    public void setHeight(int height) {
+    public void setHeight(float height) {
         this.height = height; 
     }
 
-    public int getHeight() { 
+    public float getHeight() { 
         return this.height ; 
     }
 

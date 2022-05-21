@@ -123,8 +123,6 @@ public class CoderClassDiagram {
         } else if ( type == 1 ) { 
             // TODO: static 
 
-            // TODO: Multiple parameters
-
             if ( paramTypes != null ) { 
                 if ( accessModifier == accessModifierType.Private ) { 
                     MethodSource<JavaClassSource> privateMethod = javaClassSource.addMethod().setName(attr[1]).setReturnType(attr[2]).setPrivate() ; 

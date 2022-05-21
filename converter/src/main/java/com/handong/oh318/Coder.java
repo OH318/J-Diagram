@@ -81,12 +81,9 @@ class Coder extends UserInput implements Parse{
         DocumentBuilder dBuilder = null ;
         Document doc = null ; 
 
-        // ArrayList<CoderClassDiagram> classDiagrams = new ArrayList<CoderClassDiagram>() ; 
-
         try {
             dBuilder = dbFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
-            // TODO Auto-generated catch block
             System.err.println("Cannot build the document!") ;
         }
 
@@ -141,12 +138,11 @@ class Coder extends UserInput implements Parse{
                         edges.setTargetClassDiagramId(element.getAttribute("target")) ; 
                     }
 
-                    // JavaClassSource jss = classDiagram.getJavaClassSource() ;
-
                     // Identify Arrows check line method
                     // type, source, target point?
                     edges.setArrowType(edges.identifyArrow(style)) ; 
                     
+                    setPointsOfEdges(element, edges); 
                     // Q. What is better between ArrayList<Edges> without Lines class between now state?  
                     // TODO: set SourcePoint and TargetPoint 
                     lines.add(edges) ; 
@@ -161,53 +157,166 @@ class Coder extends UserInput implements Parse{
                 String value = element.getAttribute("value");
                 String parentId = element.getAttribute("parent");
 
-                // TODO
-                // Q. Connection check? 
                 if ( classes.containsKey(parentId) ) {
                     String[] attrs = value.split(" ") ; 
-                    
-                    if ( type == 1 ) { 
-                        
-                    }
+
                     CoderClassDiagram ccd = classes.get(parentId) ;
                     ccd.addFieldAndMethodsInJavaClassSource(attrs, ccd.getJavaClassSource(), type); 
                 }
             }   
         }
 
-        // TODO: Inheritance & Interface 
-        for ( String key : classes.keySet() ) { 
-            CoderClassDiagram ccd = classes.get(key) ; 
+        // Add Inheritance & Interface to the source codes 
+        for ( Edges edges : lines ) { 
+            
+            System.out.println("Type: " + edges.getArrowType()) ; 
+            setInheritanceAndInterface(edges) ; 
+            System.out.println("-----------------------------"); 
+        } 
+    }
 
-            System.out.println("ID: " +key) ; 
-            for (int j = 0 ; j < lines.size(); j++) { 
+    /**
+     * 
+     * @param element
+     *          Get the source point and target point of edges by parsing element information 
 
-                // Start Point is child. 
-                String sourceId = lines.get(j).getSourceClassDiagramId() ;
-                
-                // Target point is parent. 
-                if ( ccd.getDiagram().getId().equals(sourceId)) { 
-                    String parentId = lines.get(j).getTargetClassDiagramId();   
-                    
-                    System.out.println(sourceId + " " +  parentId) ;
+     * @param edges
+     *          Set the x, y points which are gained by element to the edges 
+     */
+    public void setPointsOfEdges(Element element, Edges edges) { 
+        if(element.getFirstChild() != null) {
+            NodeList GeometryList = element.getChildNodes();
+            
+            for(int j = 0; j < GeometryList.getLength(); j++) {
+                Node cNode = GeometryList.item(j);
+               
+                if(cNode.getNodeType() == Node.ELEMENT_NODE) 
+                {
+                    Element cElement = (Element) cNode;
+                  
+                    if(cElement.getFirstChild() != null) 
+                    {
+                        NodeList pointList = cElement.getChildNodes();
+                     
+                        for(int k = 0; k < pointList.getLength(); k++) 
+                        {
+                            Node pNode = pointList.item(k);
+                            if(pNode.getNodeType() == Node.ELEMENT_NODE) 
+                            {
+                           
+                                if(!pNode.getNodeName().equals("mxPoint")) 
+                                {
+                                    continue;
+                                }
+                           
+                                Element pElement = (Element)pNode;
 
-                    // Arrow Type (generalization) 
-                    if ( lines.get(j).getArrowType() == 0 ) { 
-                        if ( classes.get(parentId)  == null ) {
-                            System.err.println("Debug1") ; 
+                                if(pElement.getAttribute("as").equals("sourcePoint")) 
+                                {
+                                    edges.getSource().setX(Float.parseFloat(pElement.getAttribute("x")));
+                                    edges.getSource().setY(Float.parseFloat(pElement.getAttribute("y")));
+                                }
+                                else if(pElement.getAttribute("as").equals("targetPoint")) 
+                                {
+                                    edges.getTarget().setX(Float.parseFloat(pElement.getAttribute("x")));
+                                    edges.getTarget().setY(Float.parseFloat(pElement.getAttribute("y")));
+                                }
+                            }
                         }
-                        else ccd.getJavaClassSource().extendSuperType(classes.get(parentId).getJavaClassSource().getClass()) ;  // ?
                     }
-                    // Arrow Type (implementation) 
-                    else if ( lines.get(j).getArrowType() == 1) { 
-                        if ( classes.get(parentId).getJavaClassSource() == null ) {
-                            System.err.println("Debug2") ; 
-                        }
-                        ccd.getJavaClassSource().implementInterface(classes.get(parentId).getJavaClassSource().getClass()) ; // ? 
-                    }
-                }   
+                }
             }
         }
+    }
+
+    /**
+     * 
+     * @param edges
+     *          Find source and target class diagram from edges including points which are the source and target. 
+     *          
+     *          if arrowType equals to 0 and find the class diagrams which are source and target, 
+     *              add the inheritance relationship to the class. 
+     *          
+     *          if arrowType equals to 1 and find the class diagrams which are source and target, 
+     *              add the implementation relationship to the class. 
+     */
+    public void setInheritanceAndInterface( Edges edges ) { 
+        CoderClassDiagram source = null ; 
+        CoderClassDiagram target = null ; 
+
+        for ( String key : classes.keySet() ) {
+            CoderClassDiagram ccd = classes.get(key) ; 
+            int check = isRange(edges, ccd) ; 
+            // source 
+            if ( check == -1 ) 
+            { 
+                source = ccd ; 
+            } 
+            // target
+            else if ( check == 1 ) 
+            { 
+                target = ccd ; 
+            }
+        }
+
+        // When finding the class diagrams which are source and target
+
+        if ( source != null && target != null ) { 
+            int arrowType = edges.getArrowType() ; 
+
+            // Inheritance 
+            if ( arrowType == 0 )
+            {
+                source.getJavaClassSource().extendSuperType(target.getJavaClassSource()) ; 
+            }
+            // Implementation
+            else if ( arrowType == 1 )
+            {
+                source.getJavaClassSource().addInterface(target.getJavaClassSource().getName()) ; 
+            }
+        } 
+    }   
+
+    
+
+    /**
+     * 
+     * @param edges
+     *          
+     * @param ccd 
+     *          
+     * @return     
+     *          
+     */     
+    public int isRange(Edges edges, CoderClassDiagram ccd) { 
+
+        float sourceX = edges.getSource().getX() ; 
+        float sourceY = edges.getSource().getY() ; 
+
+        float targetX = edges.getTarget().getX() ; 
+        float targetY = edges.getTarget().getY() ; 
+        
+        float diagramX = ccd.getDiagram().getPoint().getX() ; 
+        float diagramY = ccd.getDiagram().getPoint().getY() ; 
+
+        float diagramWidth = ccd.getDiagram().getWidth() ; 
+        float diagramHeight = ccd.getDiagram().getHeight() ; 
+
+        // Check points near the class diagram 
+
+        if ( sourceX >= diagramX - 15 && sourceX <= diagramX + diagramWidth + 15 
+            && sourceY >= diagramY - 15 && sourceY <= diagramY + diagramHeight + 15) { 
+            System.out.println("Source: " + ccd.getJavaClassSource().getName()) ; 
+            return -1; // source 
+        }
+
+        if ( targetX >=  diagramX - 15 && targetX <= diagramX + diagramWidth + 15 
+            && targetY >= diagramY - 15 && targetY <= diagramY + diagramHeight + 15) { 
+            System.out.println("Target: " + ccd.getJavaClassSource().getName()) ; 
+            return 1; // target
+        }
+
+        return 0; 
     }
 
     /**
@@ -244,6 +353,7 @@ class Coder extends UserInput implements Parse{
         File file = new File(drawioPath) ; 
 
         try {
+            // XML Parsing
             setDataFromXML(file) ;
 
             if ( classes == null ) { 
@@ -257,16 +367,17 @@ class Coder extends UserInput implements Parse{
                     String className = javaClass.getName() ; 
                     String classPath = String.format("%s/%s.java", javaPath, className); 
                     
-                    //check if any syntax error
+                    // Check if any syntax error
                     if(javaClass != null && javaClass.hasSyntaxErrors()){
                         System.err.println("SyntaxError: "+javaClass.getSyntaxErrors());
                         continue ; 
                     }
-
+                    
+                    // Make a directory and write the java source code
                     FileUtils.forceMkdir(new File(javaPath));
                     writeStringToFile(new File(classPath), javaClass.toString(), Charset.defaultCharset(), false);
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
+
                     System.out.println("IOException: "); 
                 }
             }   

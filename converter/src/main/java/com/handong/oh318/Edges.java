@@ -5,7 +5,7 @@ public class Edges {
     /*
         - ArrowType - 
         generalization, endArrow=block;endSize=16;endFill=0;html=1;
-        realizations, endArrow=block;dashed=1;endFill=0;endSize=12;html=1;
+        implementation, endArrow=block;dashed=1;endFill=0;endSize=12;html=1;
         dependencies, endArrow=open;endSize=12;dashed=1;html=1;
 
         associations, endArrow=none;html=1;edgeStyle=orthogonalEdgeStyle;
@@ -31,6 +31,11 @@ public class Edges {
     private String sourceClassDiagramId ; 
     private String targetClassDiagramId ;
 
+    Edges() { 
+        this.source = new Point() ; 
+        this.target = new Point() ;     
+    }
+
     public int identifyArrow(String style) {		//if there is no arrow type,it will return -1; 
     	int type = -1;
     	
@@ -41,7 +46,7 @@ public class Edges {
 		else if(style.contains("endArrow=block")) 
 		{
 			if(style.contains("dashed=1")){
-				type = 1; //realizations
+				type = 1; //implementation
 			}else {
 				type = 0; //generalizations
 			}
@@ -69,6 +74,7 @@ public class Edges {
 				type = 7 ;//compositions
 			}
 		}
+        arrowType = type ;
     	
     	return arrowType;
     }
@@ -109,7 +115,7 @@ public class Edges {
         return this.source ;
     }
 
-    public Point getTaregt() { 
+    public Point getTarget() { 
         return this.target ;
     }
 }
