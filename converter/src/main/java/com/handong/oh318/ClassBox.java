@@ -57,8 +57,8 @@ public class ClassBox extends Box {
         }
         
         for (MethodSource<JavaClassSource> method : src.getMethods()){
-        	maxLength = Math.max(maxLength, method.getName().length());
-        	// box.setLineCount(box.getLineCount() + 1);
+
+        	maxLength = Math.max(maxLength, method.getName().length() );
             this.lineCount += 1 ;
             methodsBoxInfo.setLineCount(methodsBoxInfo.getLineCount() + 1);
         }
@@ -72,7 +72,7 @@ public class ClassBox extends Box {
         methodsBoxInfo.setHeight(methodBoxH);
         this.setHeight(nameBoxH + fiedlBoxH + methodBoxH + 8);
 
-        int width = maxLength * 10 + 60 ;
+        int width = 225 ; 
         nameBoxInfo.setWidth(width);
         fieldsBoxInfo.setWidth(width);
         methodsBoxInfo.setWidth(width);

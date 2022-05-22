@@ -1,14 +1,13 @@
 package com.handong.oh318;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.IllegalFormatWidthException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -22,19 +21,21 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
+import org.jboss.forge.roaster.Roaster;
+import org.jboss.forge.roaster.model.JavaUnit;
+import org.jboss.forge.roaster.model.Type;
 import org.jboss.forge.roaster.model.Visibility;
 // JavaClassSource
 import org.jboss.forge.roaster.model.source.FieldSource;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
 import org.jboss.forge.roaster.model.source.MethodSource;
 import org.jboss.forge.roaster.model.source.ParameterSource;
-import org.jboss.forge.roaster.Roaster;
-import org.jboss.forge.roaster.model.JavaUnit;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-public class Extractor {
+public class Extractor extends UserInput {
     private String destinationPath ; // Destination path that .drawio file will be created
     private String directoryPath ; // Java classes directory path by user input
     private ArrayList<ClassBox> javaClassBox ; // Rapper Class for JavaClassSource
@@ -236,8 +237,9 @@ public class Extractor {
             StreamResult streamResult = new StreamResult(new File(destinationPath));
             transformer.transform(domSource, streamResult);
 
-            StreamResult stdoutResult = new StreamResult(System.out);
-            transformer.transform(domSource, stdoutResult);
+            // Standard Output
+            // StreamResult stdoutResult = new StreamResult(System.out);
+            // transformer.transform(domSource, stdoutResult);
         } catch (TransformerException tfe) {
             tfe.printStackTrace();
         }
@@ -331,15 +333,27 @@ public class Extractor {
         addAttr(fieldBox, "id", Integer.toString(id++));
     
         String valueString = "";
-        
+       
         if(f.getVisibility() == Visibility.PUBLIC){ 
             valueString = "+ " + f.getName() + " : " + f.getType();
+        } else if (f.getVisibility() == Visibility.PROTECTED){
+            valueString = "# " + f.getName() + " : " + f.getType(); 
         } else if(f.getVisibility() == Visibility.PRIVATE){
             valueString = "- " + f.getName() + " : " + f.getType();
         }
-        
+
         addAttr(fieldBox, "value", valueString); 
-        addAttr(fieldBox, "style", inclassStyleConstant);
+
+        if (f.isStatic()){
+            if ( !f.isFinal() ) {  
+                addAttr(fieldBox, "style", inclassStyleConstant + "fontStyle=4;");
+            } else { 
+                addAttr(fieldBox, "style", inclassStyleConstant);
+            }
+        } else { 
+            addAttr(fieldBox, "style", inclassStyleConstant);
+        }
+        
         addAttr(fieldBox, "vertex", "1"); 
         addAttr(fieldBox, "parent", Integer.toString(classID));
         addmxGeometry(fieldBox, -1, y , width, 26);
@@ -378,11 +392,19 @@ public class Extractor {
                 
         if(m.getVisibility() == Visibility.PUBLIC){ 
             valueString = "+ " + m.getName() + "(" + params + "): " + m.getReturnType();
+        } else if (m.getVisibility() == Visibility.PROTECTED){
+            valueString = "# " + m.getName() + "(" + params + "): " + m.getReturnType(); 
         } else if(m.getVisibility() == Visibility.PRIVATE){
             valueString = "+ " + m.getName() + "(" + params + "): " + m.getReturnType();
         }
+        
         addAttr(methodBox, "value", valueString);
-        addAttr(methodBox, "style", inclassStyleConstant);
+        if (m.isStatic()){
+            addAttr(methodBox, "style", inclassStyleConstant + "fontStyle=4;");
+        } else {
+            addAttr(methodBox, "style", inclassStyleConstant);
+        }
+        
         addAttr(methodBox, "vertex", "1");
         
         addAttr(methodBox, "parent", Integer.toString(classID));

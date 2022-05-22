@@ -23,7 +23,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-class Coder extends UserInput implements Parse{
+class Coder extends UserInput {
     // private ArrayList<JavaClassSource> classes ; 
     // ID, [Diagram, JavaClassSource]
     private HashMap<String, CoderClassDiagram > classes ;
@@ -342,14 +342,6 @@ class Coder extends UserInput implements Parse{
      */     
     public int isRange(Edges edges, CoderClassDiagram ccd) { 
 
-        // case 1 
-
-        // case 2 
-
-        // case 3 
-
-        // case 4 
-
         float sourceX = edges.getSource().getX() ; 
         float sourceY = edges.getSource().getY() ; 
 
@@ -375,22 +367,6 @@ class Coder extends UserInput implements Parse{
         }
 
         return 0; 
-    }
-
-    /**
-     * getJavaClassSources
-     * @param path
-     *      A path is directory path entered by user.  
-     *      We can create the Java source codes in the directory. 
-     * 
-     * @return ArrayList<JavaClassSource>
-     *      
-     */
-    @Override
-    public ArrayList<JavaClassSource> getJavaClassSources(String path)  {
-        // TODO 
-        
-        return null ;
     }
 
     /**
