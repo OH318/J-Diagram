@@ -30,6 +30,7 @@ import org.jboss.forge.roaster.model.Visibility;
 import org.jboss.forge.roaster.model.source.FieldSource;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
 import org.jboss.forge.roaster.model.source.MethodSource;
+import org.jboss.forge.roaster.model.source.ParameterSource;
 import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster.model.JavaUnit;
 // JavaClassBox
@@ -53,8 +54,10 @@ public class Extractor {
     private int id; // static 
     private final String inclassStyleConstant = "text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;";
     private final String classNameStyleConstant = "swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;";
-    private final String lineSeperatorStyleConstant = "line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;";
-
+    private final String speratorLineStyleConstant = "line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;";
+    private final String interfaceLineStyleConstant = "endArrow=block;dashed=1;endFill=0;endSize=12;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" ;
+    private final String extendLineStyleConstant = "endArrow=block;endSize=16;endFill=0;html=1" ;
+    
     public Extractor(String drawioFilepath, String directoryPath){
         this.drawioFilepath = drawioFilepath;
         this.directoryPath = directoryPath;
@@ -71,6 +74,16 @@ public class Extractor {
             for (Path p : paths) {
             	ClassBox cbox = new ClassBox(getJaveClassSource(p.toString()));
                 javaClassBox.add(cbox); 
+//                System.out.println("[DEBUG] CLASS " + cbox.src.getName() + " Extends " + cbox.src.getSuperType().toString());
+//                System.out.println("[DEBUG] CLASS " + cbox.src.getName() + " Interface " + cbox.src.getInterfaces().toString());
+                if (!cbox.src.getSuperType().contentEquals("java.lang.Object")) {
+                	System.out.println("SUPER! " + cbox.src.getSuperType());
+                	cbox.setExtends(cbox.src.getSuperType());
+                }
+                for (String interf : cbox.src.getInterfaces()) {
+                	System.out.println("Interface! " + cbox.src.getInterfaces());
+                	cbox.setInterface(interf);
+                }
 //            	javaClasses.add(getJaveClassSource(p.toString())) ; 
             }
             
@@ -186,6 +199,42 @@ public class Extractor {
             drawClass(classbox, i);
         	i++;
         }
+        
+        for( ClassBox classbox : javaClassBox){
+            if (classbox.getExtends() != "") {	 
+            	System.out.println("DRAW Extension");
+            	ClassBox target = null;
+                for( ClassBox b : javaClassBox){
+                	if(classbox.classId == b.classId) continue;
+                	if(classbox.getExtends().equals(b.src.getName())) {
+                		target = b;
+                		break;
+                	}
+                }
+                if (target != null) {
+                	System.out.println("[REAL] DRAW Extension");
+                	System.out.println(" Target id: " + target.classId + " zz: " + target.src.getName());
+                	drawLines(0, target, classbox);
+                }
+            }
+            
+            if (classbox.getInterface()!= "") {
+            	System.out.println("DRAW Interface");
+            	ClassBox target = null;
+                for( ClassBox b : javaClassBox){
+                	if(classbox.classId == b.classId) continue;
+                	if(classbox.getInterface().equals(b.src.getName())) {
+                		target = b;
+                		break;
+                	}
+                }
+                if (target != null) {
+                	System.out.println("[REAL] DRAW Interface");
+                	drawLines(1, target, classbox);
+                }
+            }
+        }
+        
  
             //transform the DOM Object to an XML File        
         try{
@@ -222,6 +271,25 @@ public class Extractor {
         addAttr(mxGeometry, "as", "geometry");
         element.appendChild(mxGeometry);
     }
+    
+    // add mxGeometry as a child of element 
+    private void addLinemxGeometry(Element element, ClassBox target, ClassBox source){
+    	System.out.println("LLLLLLLINE!!!!!");
+        Element mxGeometry = document.createElement("mxGeometry");
+        addAttr(mxGeometry, "width", "160");
+        addAttr(mxGeometry, "relative", "1");
+        addAttr(mxGeometry, "as", "geometry");
+      /*  
+        Element sourcePoint = document.createElement("mxPoint");
+        addAttr(sourcePoint, "x", Integer.toString(source.getX()));
+        addAttr(sourcePoint, "y", Integer.toString(source.getY()));
+        		
+        Element targetPoint = document.createElement("mxPoint");
+        addAttr(targetPoint, "x", Integer.toString(target.getX()));
+        addAttr(targetPoint, "y", Integer.toString(target.getY()));
+        */
+        element.appendChild(mxGeometry);
+    }
 
     private void drawClass(ClassBox classbox, int cid){
     	
@@ -239,8 +307,8 @@ public class Extractor {
         // Draw Classname
 
         int classID = id;
-        
-        System.out.println("classID=" + classID);
+        classbox.setID(id);
+
         Element classNameBox = document.createElement("mxCell");
         addAttr(classNameBox, "id", Integer.toString(id++));
         addAttr(classNameBox, "value", classbox.src.getName()); //  ,javaClass.getName()); // class name
@@ -250,6 +318,7 @@ public class Extractor {
         root.appendChild(classNameBox);
         
         System.out.println("DEBUG class=" + classbox.src.getName()); 
+        System.out.println("classID=" + classID);
         // TODO : get x,y coodinates somehow...
         // TODO : get "appropriate" width and height
         addmxGeometry(classNameBox, classbox.getX(), classbox.getY(), classbox.getWidth(), classbox.getHeight()) ;
@@ -269,13 +338,13 @@ public class Extractor {
         // Draw Methods
         List<MethodSource<JavaClassSource>> methodLists = classbox.src.getMethods() ;// javaClass.getMethods() ;
         for (MethodSource<JavaClassSource> method : methodLists ){
-            
             // DO NOT include constructor in drawio
             if(method.getName().equals(classbox.src.getName())) // javaClass.getName()))
                 continue;
             drawMethod(method, classID, y, classbox.getWidth());
             y +=26;
         }
+       
     }
 
     private void drawField(FieldSource<JavaClassSource> f, int classID, int y, int width){
@@ -303,7 +372,7 @@ public class Extractor {
     private void drawSeperatorLine(int classID, int y, int width){
         Element seperator = document.createElement("mxCell");
         addAttr(seperator, "id", Integer.toString(id++));
-        addAttr(seperator, "style", lineSeperatorStyleConstant);
+        addAttr(seperator, "style", speratorLineStyleConstant);
         addAttr(seperator, "vertex", "1"); // Probably conna change
         addAttr(seperator, "parent", Integer.toString(classID));
         addmxGeometry(seperator, -1, y , width, 8);
@@ -316,12 +385,21 @@ public class Extractor {
         addAttr(methodBox, "id", Integer.toString(id++));
         
         String valueString = "";
+       
+        List<ParameterSource<JavaClassSource>> paraList = m.getParameters();
+        String params = "";
         
-        // Only detects private, public
+        for (int i=0; i<paraList.size(); i++) {
+           	if (i > 0) {
+        		params = params.concat(", ");
+        	}
+        	params = params.concat(paraList.get(i).toString());
+        }
+                
         if(m.getVisibility() == Visibility.PUBLIC){ 
-            valueString = "+ " + m.getName() ;
+            valueString = "+ " + m.getName() + "(" + params + "): " + m.getReturnType();
         } else if(m.getVisibility() == Visibility.PRIVATE){
-            valueString = "- " + m.getName() ;
+            valueString = "+ " + m.getName() + "(" + params + "): " + m.getReturnType();
         }
         System.out.println("DEBUG method=" + valueString);
         addAttr(methodBox, "value", valueString); // class name
@@ -333,6 +411,30 @@ public class Extractor {
         root.appendChild(methodBox);
     }
 
+    private void drawLines(int value, ClassBox target, ClassBox source){
+
+        Element lines = document.createElement("mxCell");
+        addAttr(lines, "id", Integer.toString(id++));
+      
+
+        if(value == 0) {
+            addAttr(lines, "value", "Extends"); // class name
+        	addAttr(lines, "style", extendLineStyleConstant);         
+        }
+        else {
+            addAttr(lines, "value", ""); // class name
+        	addAttr(lines, "style", interfaceLineStyleConstant);       
+        }
+        	
+        addAttr(lines, "edge", "1"); // Probably conna change
+        addAttr(lines, "parent", "1"); // Probably conna change
+
+        addAttr(lines, "source", source.classId + ""); // Probably conna change
+        addAttr(lines, "target", target.classId + ""); // Probably conna change
+        
+        addLinemxGeometry(lines, target, source);
+        root.appendChild(lines);
+    }
 
 
 }

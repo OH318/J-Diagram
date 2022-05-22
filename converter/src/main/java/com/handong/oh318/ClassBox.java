@@ -11,6 +11,9 @@ public class ClassBox extends Box{
     public Box methodsBoxInfo = new Box();
     private int horizontalLineX ;
     private int horizontalLineY ;
+    private String _extends = "";
+    private String _interface = "";
+    public int classId;
     
     private int maxLength = 0 ;
     
@@ -57,7 +60,7 @@ public class ClassBox extends Box{
         methodsBoxInfo.setHeight(methodBoxH);
         this.setHeight(nameBoxH + fiedlBoxH + methodBoxH + 8);
 
-        int width = maxLength * 10 + 40  ;
+        int width = maxLength * 10 + 60 ;
         nameBoxInfo.setWidth(width);
         fieldsBoxInfo.setWidth(width);
         methodsBoxInfo.setWidth(width);
@@ -71,7 +74,7 @@ public class ClassBox extends Box{
     }
     
     public void setCoordinate (int idx, int maxWidth, int maxHeight) {
-    	this.setX((idx%3+1) * 80 + (idx%3) * maxWidth);
+    	this.setX((idx%3+1) * 70 + (idx%3) * maxWidth / 2);
     	this.setY((idx/3+1) * 80 + (idx/3) * maxHeight);
     	
     	nameBoxInfo.setX(this.getX());
@@ -83,5 +86,25 @@ public class ClassBox extends Box{
     	methodsBoxInfo.setX(this.getX());
     	methodsBoxInfo.setY(fieldsBoxInfo.getY() + nameBoxInfo.getHeight()+8);
     }
+
+    public void setExtends (String ext) {
+    	this._extends = ext;
+    }
     
+    public void setInterface (String interf) {
+    	this._interface = this._interface.concat(interf);
+    	// TODO Several interfaces
+    }
+    
+    public void setID (int id) {
+    	this.classId = id;
+    }
+    
+    public String getExtends() {
+    	return this._extends;
+    }
+    
+    public String getInterface() {
+    	return this._interface;
+    }
 }

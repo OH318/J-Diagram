@@ -11,12 +11,12 @@ public class Main {
     
     public static void main(String[] args) {
         
-        Extractor extractor = new Extractor( "C:\\JAVA\\test22.drawio", "C:\\JAVA\\Test") ; 
+        Extractor extractor = new Extractor( "C:\\JAVA\\testCar2.drawio", "C:\\JAVA\\Car") ; 
  //       Extractor extractor = new Extractor() ; 
     	 
         System.out.println("zzzz");
         // HashMap<String, JavaClassSource> classes = 
-        ArrayList<ClassBox> classes = extractor.getJavaClassSources(".java");
+/*        ArrayList<ClassBox> classes = extractor.getJavaClassSources(".java");
         		
         for (ClassBox jcs : classes)  {
             System.out.println("[Class]: " + jcs.src.getName()) ; 
@@ -34,7 +34,7 @@ public class Main {
                 System.out.println(m.getVisibility().name() + " " + m.getName()) ;
             }
         }   
-        
+*/        
         extractor.createDrawio();
         // for (String path : classes.keySet()) {
         //     System.out.println("[FilePath]: " + path) ; 
