@@ -11,7 +11,7 @@ public class Main {
     
     public static void main(String[] args) {
         
-        Extractor extractor = new Extractor( "C:\\JAVA\\testCar2.drawio", "C:\\JAVA\\Car") ; 
+        Extractor extractor = new Extractor( "./car.drawio", "/Users/kimseoye/Downloads/TestCASE/Car") ; 
  //       Extractor extractor = new Extractor() ; 
     	 
         System.out.println("zzzz");
