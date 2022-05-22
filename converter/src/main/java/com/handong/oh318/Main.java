@@ -11,7 +11,12 @@ public class Main {
 
         // Extractor
         if ( args[2].equals("0") ) {
-            
+            // "/Users/jinil/Desktop/create" 
+            // "/Users/jinil/Desktop/test.drawio"
+            Extractor extractor = new Extractor(javaPath, drawioPath); 
+
+            extractor.createDrawio();
+
         // Coder
         } else if ( args[2].equals("1")) { 
             System.out.println("[Coder]") ; 
