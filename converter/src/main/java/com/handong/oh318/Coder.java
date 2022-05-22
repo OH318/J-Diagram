@@ -1,18 +1,20 @@
 package com.handong.oh318 ;
 
-import org.apache.commons.io.FileUtils;
-import static org.apache.commons.io.FileUtils.writeStringToFile; 
+import static org.apache.commons.io.FileUtils.writeStringToFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.FileUtils;
 import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
 import org.w3c.dom.Document;
@@ -158,24 +160,55 @@ class Coder extends UserInput implements Parse{
                     continue ; 
                 }
 
+                String myId = element.getAttribute("id"); 
                 String value = element.getAttribute("value");
                 String parentId = element.getAttribute("parent");
 
                 if ( classes.containsKey(parentId) ) {
-                    String[] attrs = value.split(" ") ; 
+                    
+                    // String[] attrs = value.split(" ") ; 
 
-                    CoderClassDiagram ccd = classes.get(parentId) ;
-                    ccd.addFieldAndMethodsInJavaClassSource(attrs, ccd.getJavaClassSource(), type, element); 
+                    String[] attrs = null;
+                   
+                    Pattern pattern = Pattern.compile("^([\\+|\\-])\\s(.*):\\s(.*)$"); 
+                    Matcher matcher = pattern.matcher(value);
+
+                    if( matcher.find() ) {
+                        attrs = new String[ matcher.groupCount() ];
+                        for(int j = 1; j <= matcher.groupCount(); j++) {
+                            attrs[ j - 1 ] = matcher.group( j );
+                        }
+                    }
+
+                    if ( attrs != null ) {
+                        CoderClassDiagram ccd = classes.get(parentId) ;
+
+                        ccd.getDiagram().getAttributesId().put(myId, parentId);
+                        ccd.addFieldAndMethodsInJavaClassSource(attrs, ccd.getJavaClassSource(), type, element); 
+                    } else { 
+                        // Error
+                    }
                 }
             }   
         }
 
         // Add Inheritance & Interface to the source codes 
         for ( Edges edges : lines ) { 
-            
-            System.out.println("Type: " + edges.getArrowType()) ; 
+
+            for ( CoderClassDiagram ccd : classes.values() ) { 
+                String sourceId = ccd.getDiagram().getAttributesId().get(edges.getSourceClassDiagramId()) ; 
+                String targetId = ccd.getDiagram().getAttributesId().get(edges.getTargetClassDiagramId()) ; 
+
+                if ( sourceId != null ) { 
+                    edges.setSourceClassDiagramId(sourceId);
+                } 
+    
+                if ( targetId != null) {
+                    edges.setTargetClassDiagramId(targetId);
+                }
+            }
+    
             setInheritanceAndInterface(edges) ; 
-            System.out.println("-----------------------------"); 
         } 
     }
 
@@ -246,23 +279,38 @@ class Coder extends UserInput implements Parse{
      */
     public void setInheritanceAndInterface( Edges edges ) { 
         CoderClassDiagram source = null ; 
-        CoderClassDiagram target = null ; 
+        CoderClassDiagram target = null ;  
 
-        for ( String key : classes.keySet() ) {
-            CoderClassDiagram ccd = classes.get(key) ; 
-            int check = isRange(edges, ccd) ; 
-            // source 
-            if ( check == -1 ) 
-            { 
-                source = ccd ; 
-            } 
-            // target
-            else if ( check == 1 ) 
-            { 
-                target = ccd ; 
+        String sourceId = edges.getSourceClassDiagramId() ; 
+        String targetId = edges.getTargetClassDiagramId() ; 
+
+        if ( sourceId != null && targetId != null ) {
+            source = classes.get(sourceId) ; 
+            target = classes.get(targetId) ; 
+        } 
+
+        else {
+            if ( targetId != null ) target = classes.get(targetId) ; 
+            else if ( sourceId != null ) source = classes.get(sourceId) ;  
+
+            for ( String key : classes.keySet() ) {
+                CoderClassDiagram ccd = classes.get(key) ; 
+    
+                int check = isRange(edges, ccd) ; 
+                
+                // source 
+                if ( check == -1 && source == null) 
+                { 
+                    source = ccd ; 
+                } 
+                // target
+                else if ( check == 1 && target == null) 
+                { 
+                        target = ccd ; 
+                }
             }
         }
-
+        
         // When finding the class diagrams which are source and target
 
         if ( source != null && target != null ) { 
@@ -294,6 +342,14 @@ class Coder extends UserInput implements Parse{
      */     
     public int isRange(Edges edges, CoderClassDiagram ccd) { 
 
+        // case 1 
+
+        // case 2 
+
+        // case 3 
+
+        // case 4 
+
         float sourceX = edges.getSource().getX() ; 
         float sourceY = edges.getSource().getY() ; 
 
@@ -310,13 +366,11 @@ class Coder extends UserInput implements Parse{
 
         if ( sourceX >= diagramX - 15 && sourceX <= diagramX + diagramWidth + 15 
             && sourceY >= diagramY - 15 && sourceY <= diagramY + diagramHeight + 15) { 
-            System.out.println("Source: " + ccd.getJavaClassSource().getName()) ; 
             return -1; // source 
         }
 
         if ( targetX >=  diagramX - 15 && targetX <= diagramX + diagramWidth + 15 
             && targetY >= diagramY - 15 && targetY <= diagramY + diagramHeight + 15) { 
-            System.out.println("Target: " + ccd.getJavaClassSource().getName()) ; 
             return 1; // target
         }
 
@@ -382,7 +436,7 @@ class Coder extends UserInput implements Parse{
                     writeStringToFile(new File(classPath), javaClass.toString(), Charset.defaultCharset(), false);
                 } catch (IOException e) {
 
-                    System.out.println("IOException: "); 
+                    System.out.println("[IOException] "); 
                 }
             }   
 

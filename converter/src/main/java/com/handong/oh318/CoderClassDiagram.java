@@ -63,9 +63,13 @@ public class CoderClassDiagram {
             }
         }
         
-        // Remove ":" on the field name for getting an original field name. 
-        String[] temp = attr[1].trim().split(":") ; 
-        String name = temp[0] ; 
+        /**
+         *  TODO: 
+         *  Constructor 
+         *  + Person(age: int)  
+         */
+       
+        String name = attr[1] ; 
         String dataType = attr[2] ; 
 
         /**
@@ -78,17 +82,16 @@ public class CoderClassDiagram {
         } else { 
             // Parsing the type of parameters on the method 
             int paramLength = name.indexOf(")") - name.indexOf("(");
-		
+
 			if(paramLength > 1) 
 			{   
-                
 				String[] tempParamTypes = name.substring(name.indexOf("(") + 1, name.indexOf(")")).split(",");
                 
                 // Parameter should be composed to (ParameterName, DataType). 
                 // Thus, we should create the instance of paramTypes String HashMap. 
 
                 paramTypes = new HashMap<String,String>() ; 
-                String tempName = "param"; 
+                String tempName = "p"; 
                 for (int i = 0 ; i < tempParamTypes.length; i++) {
                     // param name, param data type
                     paramTypes.put(tempName.concat(Integer.toString(i)), tempParamTypes[i].trim() );
@@ -101,8 +104,9 @@ public class CoderClassDiagram {
 
         /**
          * TODO: 
-         *      Check final variable & static
          *      abstract method
+         *      parameter (name: datatype)  
+         *      constructor
          */
 
 
@@ -114,8 +118,10 @@ public class CoderClassDiagram {
         
         // Field 
         if ( type == 0 ) {
-            System.out.println(dataType) ; 
             FieldSource<JavaClassSource> field = null ; 
+
+            String[] typeAndValue = null ; 
+            if ( dataType.contains("=")) typeAndValue = dataType.split("="); 
 
             if ( accessModifier == accessModifierType.Private ) { 
                 field = javaClassSource.addField().setName(name).setType(dataType).setPrivate() ;
@@ -124,22 +130,18 @@ public class CoderClassDiagram {
                 field = javaClassSource.addField().setName(name).setType(dataType).setProtected() ;
             // Public 
             } else if ( accessModifier == accessModifierType.Public ) {
-                field = javaClassSource.addField().setName(name).setType(dataType).setPublic() ;  
-
-                /**
-                 *  When the data type includes final and static, and user initializes the value. 
-                 *  + DIRECTION: int = 7 => public static final int DIRECTION = 7 ; 
-                 */
-                if ( attr.length > 3) { 
-                    String initializer = ""; 
-
-                    for (int i = 2 ; i < attr.length ; i++)  {
-                        initializer += attr[i]; 
-                    }
-                    initializer = initializer.split("=")[1] ; 
-                    System.out.println("INITIAL" + initializer) ; 
-                    field.setLiteralInitializer(initializer) ; 
+                if ( typeAndValue == null ) {
+                    field = javaClassSource.addField().setName(name).setType(dataType).setPublic() ;  
+                }else {
+                    /**
+                     *  When the data type includes final and static, and user initializes the value. 
+                     *  + DIRECTION: int = 7 => public static final int DIRECTION = 7 ; 
+                     */
+                    field = javaClassSource.addField().setName(name).setType(typeAndValue[0]).setPublic() ;  
+                    field.setLiteralInitializer(typeAndValue[1]) ; 
                 }
+                    
+                
             }
 
             /**
@@ -184,6 +186,7 @@ public class CoderClassDiagram {
 
             if ( paramTypes != null ) { 
                 for (String paramName :  paramTypes.keySet() ) {
+
                     method.addParameter(paramTypes.get(paramName), paramName) ; 
                 }
             } 
