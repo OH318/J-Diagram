@@ -59,7 +59,7 @@ public class Extractor extends UserInput {
         this.javaClassBox = getJavaClassSources(".java");
         this.id = 0;
     }
-    
+  
     /**
      * Construct JavaClassSources from path received by user
      *
@@ -69,6 +69,7 @@ public class Extractor extends UserInput {
      * @return ArrayList<ClassBox>
      *          ArrayList for keep a classbox objects
      */
+
     public ArrayList<ClassBox> getJavaClassSources(String fileExtension) { 
         javaClassBox = new ArrayList<>() ;
         try {
@@ -106,7 +107,7 @@ public class Extractor extends UserInput {
         return javaClassBox ;
     }
 
-    
+  
     /**
      * Get .java files from a directoryPath recursively
      * 
@@ -138,6 +139,7 @@ public class Extractor extends UserInput {
         return result ; 
     }
     
+
     /**
      * Make a .java file into a JavaClassSource object 
      * 
@@ -177,11 +179,13 @@ public class Extractor extends UserInput {
         System.out.println("Done creating XML File");
     }
 
+
     /**
      * create the xml file
      * Most parts are consist of constant value
      * You can fix or update this part by yourself.
      */ 
+
     public void initXMLfile(){
         try {
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance(); 
@@ -220,6 +224,7 @@ public class Extractor extends UserInput {
         }
     }
     
+
     /**
      * Create XML file form Classbox that Wrapper class of JavaClassSource object
      * First loop is for Class
@@ -234,6 +239,7 @@ public class Extractor extends UserInput {
             drawClass(classbox, i);
         	i++;
         }
+
         // Loop for draw a relationship lines
         for( ClassBox classbox : javaClassBox){
             if (classbox.getExtends() != "") {	 
@@ -283,6 +289,7 @@ public class Extractor extends UserInput {
         }
     }
 
+
     /**
      * helper function for draw
      *
@@ -313,6 +320,7 @@ public class Extractor extends UserInput {
     }
     
     // helper function for draw3 (Lines)
+
     public void addLinemxGeometry(Element element){
         Element mxGeometry = document.createElement("mxGeometry");
         addAttr(mxGeometry, "width", "160");
@@ -320,7 +328,6 @@ public class Extractor extends UserInput {
         addAttr(mxGeometry, "as", "geometry");
         element.appendChild(mxGeometry);
     }
-
 
     /**
      * Drawing a classboxes on XML file 
@@ -330,6 +337,7 @@ public class Extractor extends UserInput {
      * @param cid
      *      variable for prevent a duplicated XML 
      */
+
     public void drawClass(ClassBox classbox, int cid){
     	
     	// for XML header
@@ -382,6 +390,7 @@ public class Extractor extends UserInput {
        
     }
 
+
     /**
      * Drawing a fieldbox
      *
@@ -394,6 +403,7 @@ public class Extractor extends UserInput {
      * @param width
      *      width for field
      */
+
     public void drawField(FieldSource<JavaClassSource> f, int classID, int y, int width){
         Element fieldBox = document.createElement("mxCell");
         addAttr(fieldBox, "id", Integer.toString(id++));
@@ -478,6 +488,7 @@ public class Extractor extends UserInput {
         root.appendChild(methodBox);
     }
 
+
     /**
      * Draw a Relationship lines
      * @param value
@@ -487,6 +498,7 @@ public class Extractor extends UserInput {
      * @param source
      *      Start classbox of line
      */
+
     public void drawLines(int value, ClassBox target, ClassBox source){
 
         Element lines = document.createElement("mxCell");
