@@ -1,70 +1,43 @@
-# j-diagram README
+# J_Diagram
 
-This is the README for your extension "j-diagram". After writing up a brief description, we recommend including the following sections.
+J-Diagram is a Visual Studio Code extension to help Java developers. This provides a convenient conversion between the Java source code and the class diagram. 
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+J-Diagram supports 2 major features
+1. Convert Java sources to drawio diagram
+2. Extract Java sources from drawio diagram
 
-For example if there is an image subfolder under your extension project workspace:
+### How to Use J-Diagram
 
-\!\[feature X\]\(images/feature-x.png\)
+1. Convert Java sources to drawio diagram
+    1. Open command palette ( `cmd` or `alt` +`shift` + `p`).
+    2. Type `J-diagram : Convert Source to Diagram` to change Java sources into drawio diagram
+    3. Choose a way you would like to specify a path to Java sources.
+    4. Specify where to find java sources
+    5. The path may be a directory path for Java sources or a file path for just one Java file.
+    6. Then, decide where you would like drawio file to be created. The file will have name of `j-diagram.drawio`
+ 
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+2. Extract  Java sources from drawio diagram
+    1. Open command palette ( `cmd` or `alt` +`shift` + `p`).
+    2. Type `J-diagram : Convert Diagram to Sources` to extract Java sources from drawio diagram.
+    3. Choose a way you would like to specify a path to drawio file.
+    4. Then, locate the drawiofile.
+    5. Decide where you would like Java files to be created.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+- **[Drawio Extension](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio)** must be installed.
 
 ## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- TBA
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+This is the first release of the extension. This is to test if we could successfully 
 
-### 1.0.0
+### 0.8.0
 
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Initial release of J-Diagram
+The version number has no meaning.

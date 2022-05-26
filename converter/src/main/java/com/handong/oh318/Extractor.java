@@ -36,7 +36,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class Extractor extends UserInput {
-    private String destinationPath ; // Destination path that .drawio file will be created
+    private String drawioPath ; // drawio path that .drawio file will be created
     private String directoryPath ; // Java classes directory path by user input
     private ArrayList<ClassBox> javaClassBox ; // Rapper Class for JavaClassSource
     private Document document ;
@@ -53,12 +53,12 @@ public class Extractor extends UserInput {
     private final String extendLineStyleConstant = "endArrow=block;endSize=16;endFill=0;html=1" ;
     
     public Extractor(String directoryPath, String drawioFilepath){
-        this.destinationPath = drawioFilepath;
         this.directoryPath = directoryPath;
+        this.drawioPath = drawioFilepath;
         this.javaClassBox = getJavaClassSources(".java");
         this.id = 0;
     }
-    
+
     public ArrayList<ClassBox> getJavaClassSources(String fileExtension) { 
         javaClassBox = new ArrayList<>() ;
         try {
@@ -97,7 +97,7 @@ public class Extractor extends UserInput {
     }
 
     // Get a .java file from a directoryPath recursively
-    public static List<Path> getJavaFilepaths(String directoryPath) throws IOException {
+    public List<Path> getJavaFilepaths(String directoryPath) throws IOException {
         Path dirPath = Paths.get(directoryPath) ; 
         
         if (!Files.exists(dirPath)) {
@@ -119,8 +119,8 @@ public class Extractor extends UserInput {
     }
     
     // Make a .java file into a JavaClassSource object 
-    public static JavaClassSource getJaveClassSource(String directoryPath) throws IOException { 
-        BufferedReader br = new BufferedReader(new FileReader(directoryPath));
+    public JavaClassSource getJaveClassSource(String javaFilePath) throws IOException { 
+        BufferedReader br = new BufferedReader(new FileReader(javaFilePath));
 
         String line ; 
         String javacode = ""; 
@@ -147,7 +147,7 @@ public class Extractor extends UserInput {
     }
 
     // create the xml file
-    private void initXMLfile(){
+    public void initXMLfile(){
         try {
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance(); 
             DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
@@ -186,7 +186,7 @@ public class Extractor extends UserInput {
     }
     
     //transform the DOM Object to an XML File
-    private void createFile(){
+    public void createFile(){
     	int i = 1;
  
     	// Loop for draw a classboxes 
@@ -194,20 +194,26 @@ public class Extractor extends UserInput {
             drawClass(classbox, i);
         	i++;
         }
-        
+
+        System.out.println("SIZE:" + javaClassBox.size());         
         // Loop for draw a relationship lines
         for( ClassBox classbox : javaClassBox){
             if (classbox.getExtends() != "") {	 
+
             	ClassBox target = null;
             	// Loop for find extends relationship
                 for( ClassBox b : javaClassBox){
                 	if(classbox.getClassId() == b.getClassId()) continue;
-                	if(classbox.getExtends().equals(b.getJavaClassSource().getName())) {
+                    // System.out.println("T: " + classbox.getExtends() + " " + b.getJavaClassSource().getName()) ; 
+                    // String[] j = classbox.getExtends().split(".") ;
+                    // System.out.println("TT" + j.length) ; 
+                	if(classbox.getExtends().endsWith(b.getJavaClassSource().getName())) {
                 		target = b;
                 		break;
                 	}
                 }
                 if (target != null) {
+                    System.out.println("TEST");
                 	// Draw a extends line
                 	drawLines(0, target, classbox);
                 }
@@ -234,7 +240,7 @@ public class Extractor extends UserInput {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource domSource = new DOMSource(document);
-            StreamResult streamResult = new StreamResult(new File(destinationPath));
+            StreamResult streamResult = new StreamResult(new File(drawioPath));
             transformer.transform(domSource, streamResult);
 
             // Standard Output
@@ -246,14 +252,14 @@ public class Extractor extends UserInput {
     }
 
     // helper function for draw
-    private void addAttr(Element element, String attrName, String attrValue){
+    public void addAttr(Element element, String attrName, String attrValue){
         Attr attr = document.createAttribute("id");
         attr.setValue(attrValue);
         element.setAttribute(attrName, attrValue);
     }
     
     // helper function for draw2 (Child)
-    private void addmxGeometry(Element element, int x, int y, int width, int height){
+    public void addmxGeometry(Element element, int x, int y, int width, int height){
         Element mxGeometry = document.createElement("mxGeometry");
         if(x != -1)
             addAttr(mxGeometry, "x", Integer.toString(x));
@@ -266,7 +272,7 @@ public class Extractor extends UserInput {
     }
     
     // helper function for draw3 (Lines)
-    private void addLinemxGeometry(Element element, ClassBox target, ClassBox source){
+    public void addLinemxGeometry(Element element, ClassBox target, ClassBox source){
         Element mxGeometry = document.createElement("mxGeometry");
         addAttr(mxGeometry, "width", "160");
         addAttr(mxGeometry, "relative", "1");
@@ -275,7 +281,7 @@ public class Extractor extends UserInput {
     }
 
     // Drawing a classboxes
-    private void drawClass(ClassBox classbox, int cid){
+    public void drawClass(ClassBox classbox, int cid){
     	
     	// for XML header
     	if(cid == 1) {
@@ -328,7 +334,7 @@ public class Extractor extends UserInput {
     }
 
     // Draw a AttributesBox
-    private void drawField(FieldSource<JavaClassSource> f, int classID, int y, int width){
+    public void drawField(FieldSource<JavaClassSource> f, int classID, int y, int width){
         Element fieldBox = document.createElement("mxCell");
         addAttr(fieldBox, "id", Integer.toString(id++));
     
@@ -361,7 +367,7 @@ public class Extractor extends UserInput {
     }
     
     // Draw a SeperatorLine
-    private void drawSeperatorLine(int classID, int y, int width){
+    public void drawSeperatorLine(int classID, int y, int width){
         Element seperator = document.createElement("mxCell");
         addAttr(seperator, "id", Integer.toString(id++));
         addAttr(seperator, "style", speratorLineStyleConstant);
@@ -372,7 +378,7 @@ public class Extractor extends UserInput {
     }
     
     // Draw a MethodsBox
-    private void drawMethod(MethodSource<JavaClassSource> m, int classID, int y, int width){
+    public void drawMethod(MethodSource<JavaClassSource> m, int classID, int y, int width){
 
         Element methodBox = document.createElement("mxCell");
         addAttr(methodBox, "id", Integer.toString(id++));
@@ -413,7 +419,7 @@ public class Extractor extends UserInput {
     }
 
     // Draw a Relationship lines
-    private void drawLines(int value, ClassBox target, ClassBox source){
+    public void drawLines(int value, ClassBox target, ClassBox source){
 
         Element lines = document.createElement("mxCell");
         addAttr(lines, "id", Integer.toString(id++));
@@ -438,5 +444,16 @@ public class Extractor extends UserInput {
         root.appendChild(lines);
     }
 
+    public String getDrawioPath() { 
+        return this.drawioPath; 
+    }
+
+    public String getDirectoryPath() { 
+        return this.directoryPath ; 
+    }
+
+    public Document getDocument() {
+        return this.document ; 
+    }
 
 }

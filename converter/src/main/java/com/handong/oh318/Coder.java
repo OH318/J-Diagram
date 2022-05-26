@@ -34,6 +34,14 @@ class Coder extends UserInput {
         lines = new ArrayList<Edges>() ;
     }
 
+    public HashMap<String, CoderClassDiagram> getClasses() { 
+        return this.classes ; 
+    }
+
+    public ArrayList<Edges> getLines() {
+        return this.lines ; 
+    }
+
     public CoderClassDiagram createJavaClassSourceAndSetLocation(int id, Element element) {
         CoderClassDiagram classDiagram = new CoderClassDiagram() ; 
 
@@ -78,7 +86,7 @@ class Coder extends UserInput {
      * @throws SAXException
      */
 
-    public void setDataFromXML(File drawioFile) throws IOException {
+    public boolean setDataFromXML(File drawioFile) throws IOException {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = null ;
         Document doc = null ; 
@@ -94,7 +102,8 @@ class Coder extends UserInput {
         } catch ( SAXException e) { 
             System.err.println("Cannot parse the XML file!") ; 
         }
- 
+        
+        if ( doc == null ) return false;
         doc.getDocumentElement().normalize();
 
         NodeList nList = doc.getElementsByTagName("mxCell");    
@@ -117,6 +126,7 @@ class Coder extends UserInput {
                 // Class name
                 if( element.getAttribute("parent").compareTo("1") == 0 
                         && !element.getAttribute("style").contains("endArrow") ) {
+                        
 
                     type = 0 ; 
                     // Create JavaClassSource & Set Location and Size
@@ -165,8 +175,6 @@ class Coder extends UserInput {
                 String parentId = element.getAttribute("parent");
 
                 if ( classes.containsKey(parentId) ) {
-                    
-                    // String[] attrs = value.split(" ") ; 
 
                     String[] attrs = null;
                    
@@ -185,9 +193,7 @@ class Coder extends UserInput {
 
                         ccd.getDiagram().getAttributesId().put(myId, parentId);
                         ccd.addFieldAndMethodsInJavaClassSource(attrs, ccd.getJavaClassSource(), type, element); 
-                    } else { 
-                        // Error
-                    }
+                    } 
                 }
             }   
         }
@@ -210,6 +216,8 @@ class Coder extends UserInput {
     
             setInheritanceAndInterface(edges) ; 
         } 
+
+        return true ;
     }
 
     /**
@@ -306,7 +314,7 @@ class Coder extends UserInput {
                 // target
                 else if ( check == 1 && target == null) 
                 { 
-                        target = ccd ; 
+                    target = ccd ; 
                 }
             }
         }
@@ -322,7 +330,7 @@ class Coder extends UserInput {
                 source.getJavaClassSource().extendSuperType(target.getJavaClassSource()) ; 
             }
             // Implementation
-            else if ( arrowType == 1 )
+            if ( arrowType == 1 )
             {
                 source.getJavaClassSource().addInterface(target.getJavaClassSource().getName()) ; 
             }
@@ -385,12 +393,12 @@ class Coder extends UserInput {
          */
         // "/Users/jinil/Desktop/Drawio/car.drawio"
         File file = new File(drawioPath) ; 
-
+        boolean success ; 
         try {
             // XML Parsing
-            setDataFromXML(file) ;
+            success = setDataFromXML(file) ;
 
-            if ( classes == null ) { 
+            if ( !success ) { 
                 return false ; 
             } 
 
