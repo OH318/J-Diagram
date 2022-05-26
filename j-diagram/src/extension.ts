@@ -10,7 +10,16 @@ export function activate(context: vscode.ExtensionContext) {
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "J-Diagram" is now active!!!');
-
+	var downloadCommand = "mkdir -p /tmp && wget https://github.com/OH318/J-Diagram/releases/download/v.0.0.1/J-d.jar -O /tmp/J-d.jar";
+	const { exec } = require('child_process');
+		exec(downloadCommand, (err: any, stdout: any, stderr: any) => {
+		if(err) {
+			console.log(`1]err : ${err.message}`);
+		}
+		console.log(`1]stderr: ${stderr}`);
+		console.log(`1]stdout: ${stdout}`);	
+	});
+	
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
@@ -72,7 +81,17 @@ export function activate(context: vscode.ExtensionContext) {
 
 		//var downloadCommand = "wget https://github.com/qpalzmm22/testRepo/blob/main/J-d.jar";
 
-		const { exec } = require('child_process');
+		//const { exec } = require('child_process');
+
+		// var downloadCommand = "wget https://github.com/qpalzmm22/testRepo/releases/download/0.0.2/J-d.jar -O /tmp/J-d.jar";
+		// await exec(downloadCommand, (err: any, stdout: any, stderr: any) => {
+		// 	if(err) {
+		// 		console.log(`1]err : ${err.message}`);
+		// 	}
+		// 	console.log(`1]stderr: ${stderr}`);
+		// 	console.log(`1]stdout: ${stdout}`);	
+		// });
+
 
 		var command =  "java -jar /tmp/J-d.jar " + javaPath + " " + drawioPath + " " + "1"; // 1 for Coder
 		console.log('command : ' + command);
@@ -146,9 +165,9 @@ export function activate(context: vscode.ExtensionContext) {
 			drawioPath = './';
 		}
 		
-		//var downloadCommand = "wget -x https://github.com/qpalzmm22/testRepo/blob/main/J-d.jar -O ./J-d.jar";
-		const { exec } = require('child_process');
-		// exec(downloadCommand, (err: any, stdout: any, stderr: any) => {
+		// var downloadCommand = "wget https://github.com/qpalzmm22/testRepo/releases/download/0.0.2/J-d.jar -O /tmp/J-d.jar";
+		// const { exec } = require('child_process');
+		// await exec(downloadCommand, (err: any, stdout: any, stderr: any) => {
 		// 	if(err) {
 		// 		console.log(`1]err : ${err.message}`);
 		// 	}
@@ -158,9 +177,9 @@ export function activate(context: vscode.ExtensionContext) {
 		var command =  "java -jar /tmp/J-d.jar " + javaPath + " " + drawioPath + "/j-diagram.drawio " + "0"; // 0 for Extractor
 		console.log('command : ' + command);
 
-		// Delay for download
+		
 		//const { exec } = require('child_process');
-		exec(command, (err: any, stdout: any, stderr: any) => {
+		await exec(command, (err: any, stdout: any, stderr: any) => {
 			if(err) {
 				console.log(`err : ${err.message}`);
 			}
