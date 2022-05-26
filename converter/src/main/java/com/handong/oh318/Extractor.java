@@ -194,8 +194,7 @@ public class Extractor extends UserInput {
             drawClass(classbox, i);
         	i++;
         }
-
-        System.out.println("SIZE:" + javaClassBox.size());         
+ 
         // Loop for draw a relationship lines
         for( ClassBox classbox : javaClassBox){
             if (classbox.getExtends() != "") {	 
@@ -204,16 +203,13 @@ public class Extractor extends UserInput {
             	// Loop for find extends relationship
                 for( ClassBox b : javaClassBox){
                 	if(classbox.getClassId() == b.getClassId()) continue;
-                    // System.out.println("T: " + classbox.getExtends() + " " + b.getJavaClassSource().getName()) ; 
-                    // String[] j = classbox.getExtends().split(".") ;
-                    // System.out.println("TT" + j.length) ; 
+
                 	if(classbox.getExtends().endsWith(b.getJavaClassSource().getName())) {
                 		target = b;
                 		break;
                 	}
                 }
                 if (target != null) {
-                    System.out.println("TEST");
                 	// Draw a extends line
                 	drawLines(0, target, classbox);
                 }
@@ -325,8 +321,8 @@ public class Extractor extends UserInput {
         // Draw a MethodsBox
         List<MethodSource<JavaClassSource>> methodLists = classbox.getJavaClassSource().getMethods() ;
         for (MethodSource<JavaClassSource> method : methodLists ){
-            if(method.getName().equals(classbox.getJavaClassSource().getName()))
-                continue;
+            // if(method.getName().equals(classbox.getJavaClassSource().getName()))
+            //     continue;
             drawMethod(method, classID, y, classbox.getWidth());
             y +=26;
         }
@@ -339,14 +335,37 @@ public class Extractor extends UserInput {
         addAttr(fieldBox, "id", Integer.toString(id++));
     
         String valueString = "";
-       
-        if(f.getVisibility() == Visibility.PUBLIC){ 
-            valueString = "+ " + f.getName() + " : " + f.getType();
-        } else if (f.getVisibility() == Visibility.PROTECTED){
-            valueString = "# " + f.getName() + " : " + f.getType(); 
-        } else if(f.getVisibility() == Visibility.PRIVATE){
-            valueString = "- " + f.getName() + " : " + f.getType();
+        
+        String typesArgs = "" ; 
+        int typeArgsSize = f.getType().getTypeArguments().size() ;
+
+        for (int i = 0 ; i < typeArgsSize; i++ ) {
+            if ( i > 0 ) { 
+                typesArgs += (f.getType().getTypeArguments().get(i).toString() + ", ") ;
+            } else {
+                typesArgs += f.getType().getTypeArguments().get(i).toString();
+            }
         }
+
+        if ( typeArgsSize > 0 )  { 
+
+            if(f.getVisibility() == Visibility.PUBLIC){ 
+                valueString = ("+ " + f.getName() + " : " + f.getType() + "&lt;" + typesArgs + "&gt;");
+            } else if (f.getVisibility() == Visibility.PROTECTED){
+                valueString = ("# " + f.getName() + " : " + f.getType() + "&lt;" + typesArgs + "&gt;"); 
+            } else if(f.getVisibility() == Visibility.PRIVATE){
+                valueString = ("- " + f.getName() + " : " + f.getType() + "&lt;" + typesArgs + "&gt;");
+            }
+        } else {
+            if(f.getVisibility() == Visibility.PUBLIC){ 
+                valueString = "+ " + f.getName() + " : " + f.getType() + typesArgs;
+            } else if (f.getVisibility() == Visibility.PROTECTED){
+                valueString = "# " + f.getName() + " : " + f.getType() + typesArgs; 
+            } else if(f.getVisibility() == Visibility.PRIVATE){
+                valueString = "- " + f.getName() + " : " + f.getType() + typesArgs;
+            }
+        }
+        
 
         addAttr(fieldBox, "value", valueString); 
 
@@ -395,13 +414,45 @@ public class Extractor extends UserInput {
 
         	params = params.concat(paraList.get(i).toString().split(" ")[0]);
         }
-                
-        if(m.getVisibility() == Visibility.PUBLIC){ 
-            valueString = "+ " + m.getName() + "(" + params + "): " + m.getReturnType();
-        } else if (m.getVisibility() == Visibility.PROTECTED){
-            valueString = "# " + m.getName() + "(" + params + "): " + m.getReturnType(); 
-        } else if(m.getVisibility() == Visibility.PRIVATE){
-            valueString = "+ " + m.getName() + "(" + params + "): " + m.getReturnType();
+
+        if ( m.isConstructor() ) { 
+            
+            if(m.getVisibility() == Visibility.PUBLIC){ 
+                valueString = "+ " + m.getName() + "(" + params + ")";
+            } else if (m.getVisibility() == Visibility.PROTECTED){
+                valueString = "# " + m.getName() + "(" + params + ")";  
+            } else if(m.getVisibility() == Visibility.PRIVATE){
+                valueString = "+ " + m.getName() + "(" + params + ")";
+            }
+        } else { 
+            String typesArgs = "" ; 
+            int typeArgsSize = m.getReturnType().getTypeArguments().size() ;
+
+            for (int i = 0 ; i < typeArgsSize; i++ ) {
+                if ( i > 0 ) { 
+                    typesArgs += (m.getReturnType().getTypeArguments().get(i).toString() + ", ") ;
+                } else {
+                    typesArgs += m.getReturnType().getTypeArguments().get(i).toString();
+                }
+            }
+            
+            if ( typeArgsSize > 0 )  { 
+                if(m.getVisibility() == Visibility.PUBLIC){ 
+                    valueString = "+ " + m.getName() + "(" + params + "): " + m.getReturnType() + "&lt;" + typesArgs + "&gt;";
+                } else if (m.getVisibility() == Visibility.PROTECTED){
+                    valueString = "# " + m.getName() + "(" + params + "): " + m.getReturnType() + "&lt;" + typesArgs + "&gt;";
+                } else if(m.getVisibility() == Visibility.PRIVATE){
+                    valueString = "+ " + m.getName() + "(" + params + "): " + m.getReturnType() + "&lt;" + typesArgs + "&gt;";
+                }
+            } else { 
+                if(m.getVisibility() == Visibility.PUBLIC){ 
+                    valueString = "+ " + m.getName() + "(" + params + "): " + m.getReturnType();
+                } else if (m.getVisibility() == Visibility.PROTECTED){
+                    valueString = "# " + m.getName() + "(" + params + "): " + m.getReturnType(); 
+                } else if(m.getVisibility() == Visibility.PRIVATE){
+                    valueString = "+ " + m.getName() + "(" + params + "): " + m.getReturnType();
+                }
+            }
         }
         
         addAttr(methodBox, "value", valueString);

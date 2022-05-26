@@ -47,7 +47,7 @@ public class CoderClassDiagram {
         /**
          * Access Modifier 
          * -: private 
-         * #: protected
+         * #: protected 
          * +: public 
          */
         if ( attr[0] != null ) {
@@ -70,7 +70,6 @@ public class CoderClassDiagram {
          */
        
         String name = attr[1] ; 
-        String dataType = attr[2] ; 
 
         /**
          * Field (=0), Method(=1)
@@ -114,8 +113,15 @@ public class CoderClassDiagram {
          * Attribute
          * DataType [Field, Method] 
          * */ 
-        dataType = dataType.trim() ; 
-        
+        String dataType = null ; 
+        boolean constructor = false; 
+
+        if ( attr.length == 2 ) {
+            constructor = true ; 
+        } else if ( attr.length == 3 ) {
+            dataType = attr[2].trim() ; 
+        }
+
         // Field 
         if ( type == 0 ) {
             FieldSource<JavaClassSource> field = null ; 
@@ -140,8 +146,8 @@ public class CoderClassDiagram {
                     field = javaClassSource.addField().setName(name).setType(typeAndValue[0]).setPublic() ;  
                     field.setLiteralInitializer(typeAndValue[1]) ; 
                 }
-                    
-                
+            } else {
+                javaClassSource.addField().setName(name).setType(dataType);
             }
 
             /**
@@ -176,12 +182,23 @@ public class CoderClassDiagram {
 
             MethodSource<JavaClassSource> method = null ; 
 
-            if ( accessModifier == accessModifierType.Private ) { 
-                method = javaClassSource.addMethod().setName(name).setReturnType(dataType).setPrivate() ; 
-            } else if ( accessModifier == accessModifierType.Protected ) { 
-                method = javaClassSource.addMethod().setName(name).setReturnType(dataType).setProtected(); 
-            } else if ( accessModifier == accessModifierType.Public ) { 
-                method = javaClassSource.addMethod().setName(name).setReturnType(dataType).setPublic(); 
+            if ( constructor ) {
+                if ( accessModifier == accessModifierType.Private ) { 
+                    method = javaClassSource.addMethod().setName(name).setPrivate().setConstructor(true) ; 
+                } else if ( accessModifier == accessModifierType.Protected ) { 
+                    method = javaClassSource.addMethod().setName(name).setProtected().setConstructor(true); 
+                } else if ( accessModifier == accessModifierType.Public ) { 
+                    method = javaClassSource.addMethod().setName(name).setPublic().setConstructor(true); 
+                }
+            }
+            else {
+                if ( accessModifier == accessModifierType.Private ) { 
+                    method = javaClassSource.addMethod().setName(name).setReturnType(dataType).setPrivate() ; 
+                } else if ( accessModifier == accessModifierType.Protected ) { 
+                    method = javaClassSource.addMethod().setName(name).setReturnType(dataType).setProtected(); 
+                } else if ( accessModifier == accessModifierType.Public ) { 
+                    method = javaClassSource.addMethod().setName(name).setReturnType(dataType).setPublic(); 
+                }
             }
 
             if ( paramTypes != null ) { 

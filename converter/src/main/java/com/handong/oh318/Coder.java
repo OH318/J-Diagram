@@ -127,7 +127,6 @@ class Coder extends UserInput {
                 if( element.getAttribute("parent").compareTo("1") == 0 
                         && !element.getAttribute("style").contains("endArrow") ) {
                         
-
                     type = 0 ; 
                     // Create JavaClassSource & Set Location and Size
                     classDiagram = createJavaClassSourceAndSetLocation(id, element) ; 
@@ -177,14 +176,30 @@ class Coder extends UserInput {
                 if ( classes.containsKey(parentId) ) {
 
                     String[] attrs = null;
-                   
-                    Pattern pattern = Pattern.compile("^([\\+|\\-])\\s(.*):\\s(.*)$"); 
-                    Matcher matcher = pattern.matcher(value);
-
-                    if( matcher.find() ) {
-                        attrs = new String[ matcher.groupCount() ];
-                        for(int j = 1; j <= matcher.groupCount(); j++) {
-                            attrs[ j - 1 ] = matcher.group( j );
+                    
+                    // General Methods
+                    if ( value.contains(":") ) {
+                        Pattern pattern = Pattern.compile("^([\\+|\\-])\\s*(.*):\\s*(.*)$"); 
+                        Matcher matcher = pattern.matcher(value); 
+                        
+                        if( matcher.find() ) {
+                            attrs = new String[ matcher.groupCount() ];
+                            for(int j = 1; j <= matcher.groupCount(); j++) {
+                                attrs[ j - 1 ] = matcher.group( j );
+                            }
+                        }
+                    // Constructor
+                    } else { 
+                        if ( type == 1 ) {
+                            Pattern pattern = Pattern.compile("^([\\+|\\-])*\\s(.*)"); 
+                            Matcher matcher = pattern.matcher(value); 
+                            
+                            if( matcher.find() ) {
+                                attrs = new String[ matcher.groupCount() ];
+                                for(int j = 1; j <= matcher.groupCount(); j++) {
+                                    attrs[ j - 1 ] = matcher.group( j );
+                                }
+                            }
                         }
                     }
 
@@ -420,13 +435,13 @@ class Coder extends UserInput {
                     writeStringToFile(new File(classPath), javaClass.toString(), Charset.defaultCharset(), false);
                 } catch (IOException e) {
 
-                    System.out.println("[IOException] "); 
+                    System.err.println("[IOException] "); 
                 }
             }   
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            System.out.println("IOException: cannot get the data from XML"); 
+            System.err.println("IOException: cannot get the data from XML"); 
         } 
 
         return true; 

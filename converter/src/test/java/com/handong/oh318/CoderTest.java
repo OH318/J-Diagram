@@ -1,12 +1,12 @@
 package com.handong.oh318;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -152,8 +152,43 @@ public class CoderTest {
  
     @Test
     public void testCreateSourceCodes() {
-
+        Coder nullCoder = new Coder() ; 
         assertEquals(true, coder.createSourceCodes("src/test/resource/output1","src/test/resource/car.drawio"));
-        assertEquals(false, coder.createSourceCodes("src/test/resource/output2", "src/test/resource/empty.drawio"));
+        assertEquals(false, nullCoder.createSourceCodes("src/test/resource/output2", "src/test/resource/empty.drawio"));
+    }
+
+    @Test
+    public void testMethods() { 
+        String[] methods = {"+ Person()", "+ Person(String)", "+ Person(String, int)", "+     setName(String, int) :void", "+      getName():String"} ; 
+        
+        for (int i = 0 ; i < methods.length; i++) {
+            String[] attrs = null;
+            
+            if ( methods[i].contains(":") ) {
+                Pattern pattern = Pattern.compile("^([\\+|\\-])\\s*(.*):\\s*(.*)$"); 
+                Matcher matcher = pattern.matcher(methods[i]); 
+                
+                if( matcher.find() ) {
+                    attrs = new String[ matcher.groupCount() ];
+                    for(int j = 1; j <= matcher.groupCount(); j++) {
+                        attrs[ j - 1 ] = matcher.group( j );
+                        System.out.println(attrs[j-1]) ;
+                    }
+                    assertEquals(attrs.length, 3);
+                }
+            } else { 
+                Pattern pattern = Pattern.compile("^([\\+|\\-])*\\s(.*)"); 
+                Matcher matcher = pattern.matcher(methods[i]); 
+                
+                if( matcher.find() ) {
+                    attrs = new String[ matcher.groupCount() ];
+                    for(int j = 1; j <= matcher.groupCount(); j++) {
+                        attrs[ j - 1 ] = matcher.group( j );
+                        System.out.println(attrs[j-1]) ;
+                    }
+                    assertEquals(attrs.length, 2);
+                }
+            }
+        }
     }
 }
