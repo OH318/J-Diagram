@@ -48,7 +48,8 @@ J-Diagram is a Visual Studio Code extension to help Java developers. This provid
 
 This is the first release of the extension. This is to test if we could successfully upload 
 
-### 0.0.4
+### 0.0.6
 
 
 Initial release of J-Diagram
+s
