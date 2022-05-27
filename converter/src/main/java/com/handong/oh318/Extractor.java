@@ -59,6 +59,15 @@ public class Extractor extends UserInput {
         this.id = 0;
     }
 
+    /**
+     * Construct JavaClassSources from path received by user
+     *
+     * @param fileExtension
+     *          fileExtenstion for read only .java files
+     *
+     * @return ArrayList<ClassBox>
+     *          ArrayList for keep a classbox objects
+     */
     public ArrayList<ClassBox> getJavaClassSources(String fileExtension) { 
         javaClassBox = new ArrayList<>() ;
         try {
@@ -96,7 +105,15 @@ public class Extractor extends UserInput {
         return javaClassBox ;
     }
 
-    // Get a .java file from a directoryPath recursively
+    /**
+     * Get .java files from a directoryPath recursively
+     * 
+     * @param directoryPath
+     *          directoryPath received by user
+     * @return List<Path>
+     *
+     * @throws IOException
+     */
     public List<Path> getJavaFilepaths(String directoryPath) throws IOException {
         Path dirPath = Paths.get(directoryPath) ; 
         
@@ -118,7 +135,15 @@ public class Extractor extends UserInput {
         return result ; 
     }
     
-    // Make a .java file into a JavaClassSource object 
+    /**
+     * Make a .java file into a JavaClassSource object 
+     * 
+     * @param javaFilePath
+     *          exact .java source code file path
+     * @return JavaClassSource
+     *          Contain various class information
+     * @throws IOException
+     */
     public JavaClassSource getJaveClassSource(String javaFilePath) throws IOException { 
         BufferedReader br = new BufferedReader(new FileReader(javaFilePath));
 
@@ -134,7 +159,9 @@ public class Extractor extends UserInput {
         return javaClassSource;
     }
 
-    // (Main) Draw a .drawio file
+    /**
+     * Main for draw a .drawio XML file
+     */ 
     public void createDrawio(){
     	
     	// create the xml file
@@ -146,7 +173,11 @@ public class Extractor extends UserInput {
         System.out.println("Done creating XML File");
     }
 
-    // create the xml file
+    /**
+     * create the xml file
+     * Most parts are consist of constant value
+     * You can fix or update this part by yourself.
+     */ 
     public void initXMLfile(){
         try {
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance(); 
@@ -185,7 +216,11 @@ public class Extractor extends UserInput {
         }
     }
     
-    //transform the DOM Object to an XML File
+    /**
+     * Create XML file form Classbox that Wrapper class of JavaClassSource object
+     * First loop is for Class
+     * Second loop is for Line (Extends, Interface, ... will be updated)
+     */
     public void createFile(){
     	int i = 1;
  
@@ -247,7 +282,15 @@ public class Extractor extends UserInput {
         }
     }
 
-    // helper function for draw
+    /**
+     * helper function for draw
+     *
+     * @param element
+     *      
+     * @param attrName
+     * 
+     * @param attrValue
+     */
     public void addAttr(Element element, String attrName, String attrValue){
         Attr attr = document.createAttribute("id");
         attr.setValue(attrValue);
@@ -276,7 +319,14 @@ public class Extractor extends UserInput {
         element.appendChild(mxGeometry);
     }
 
-    // Drawing a classboxes
+    /**
+     * Drawing a classboxes on XML file 
+     * 
+     * @param classbox
+     *      Wapper class for JavaClassSoure contining class information
+     * @param cid
+     *      variable for prevent a duplicated XML 
+     */
     public void drawClass(ClassBox classbox, int cid){
     	
     	// for XML header
@@ -329,7 +379,18 @@ public class Extractor extends UserInput {
        
     }
 
-    // Draw a AttributesBox
+    /**
+     * Drawing a fieldbox
+     *
+     * @param f
+     *      Objects with information for the field
+     * @param classID 
+     *      parent class id of this field
+     * @param y
+     *      y-axis for field
+     * @param width
+     *      width for field
+     */
     public void drawField(FieldSource<JavaClassSource> f, int classID, int y, int width){
         Element fieldBox = document.createElement("mxCell");
         addAttr(fieldBox, "id", Integer.toString(id++));
@@ -435,7 +496,7 @@ public class Extractor extends UserInput {
                     typesArgs += m.getReturnType().getTypeArguments().get(i).toString();
                 }
             }
-            
+
             if ( typeArgsSize > 0 )  { 
                 if(m.getVisibility() == Visibility.PUBLIC){ 
                     valueString = "+ " + m.getName() + "(" + params + "): " + m.getReturnType() + "&lt;" + typesArgs + "&gt;";
@@ -469,7 +530,15 @@ public class Extractor extends UserInput {
         root.appendChild(methodBox);
     }
 
-    // Draw a Relationship lines
+    /**
+     * Draw a Relationship lines
+     * @param value
+     *      Variable to distinguish types of relationship line
+     * @param target
+     *      End classbox of line 
+     * @param source
+     *      Start classbox of line
+     */
     public void drawLines(int value, ClassBox target, ClassBox source){
 
         Element lines = document.createElement("mxCell");
