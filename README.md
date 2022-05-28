@@ -47,7 +47,7 @@ J-Diagram is a Visual Studio Code extension to help Java developers. This provid
    4. Finish the process
 2. Execute .jar file
    ```bash
-   java -jar <runnable .jar path> <java src dir path> <.drawio file path> 0|1
+   java -jar [runnable .jar path] [java src dir path] [.drawio file path] [0|1]
    # If the last argument is 0, extractor will be executed.
    # If the last argument is 1, coder will be executed. 
    ```
