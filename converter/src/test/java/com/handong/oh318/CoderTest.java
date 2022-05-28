@@ -107,7 +107,7 @@ public class CoderTest {
     public void testSetInheritanceAndInterface() {
 
         Edges edges = new Edges() ; 
-        edges.setArrowType( 1) ; // interface 
+        edges.setArrowType(0) ; // interface 
 
         edges.setSourceClassDiagramId("7");
         edges.setTargetClassDiagramId("11");
@@ -129,7 +129,7 @@ public class CoderTest {
 
         coder.setInheritanceAndInterface(edges) ;
 
-        // assertEquals(source.getJavaClassSource().isInterface(), true) ; 
+        assertEquals(source.getJavaClassSource().getSuperType(), "targetClass") ; 
     }
  
     @Test
@@ -172,7 +172,6 @@ public class CoderTest {
                     attrs = new String[ matcher.groupCount() ];
                     for(int j = 1; j <= matcher.groupCount(); j++) {
                         attrs[ j - 1 ] = matcher.group( j );
-                        System.out.println(attrs[j-1]) ;
                     }
                     assertEquals(attrs.length, 3);
                 }
@@ -184,7 +183,6 @@ public class CoderTest {
                     attrs = new String[ matcher.groupCount() ];
                     for(int j = 1; j <= matcher.groupCount(); j++) {
                         attrs[ j - 1 ] = matcher.group( j );
-                        System.out.println(attrs[j-1]) ;
                     }
                     assertEquals(attrs.length, 2);
                 }
@@ -192,3 +190,4 @@ public class CoderTest {
         }
     }
 }
+

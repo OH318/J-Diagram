@@ -95,12 +95,14 @@ class Coder extends UserInput {
             dBuilder = dbFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             System.err.println("Cannot build the document!") ;
+			return false; 
         }
 
         try {
             doc = dBuilder.parse(drawioFile); 
         } catch ( SAXException e) { 
             System.err.println("Cannot parse the XML file!") ; 
+			return false; 
         }
         
         if ( doc == null ) return false;
