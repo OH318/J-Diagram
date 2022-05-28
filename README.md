@@ -10,6 +10,9 @@ J-Diagram is a Visual Studio Code extension to help Java developers. This provid
 * [Draw.io Integration](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio)
 * Java SE >= 8
 
+## Supported Environments
+* MacOS
+
 ## Getting Started 
 
 ### Install J-Diagram to Visual Studio Code
@@ -37,22 +40,23 @@ J-Diagram is a Visual Studio Code extension to help Java developers. This provid
 
 ## Building J-Diagram from Source
 
-1. Clone this repository
-    ```bash
-    $ git clone https://github.com/OH318/J-Diagram.git
-    ```
-2. Make a runnable .jar file
-   1. Launch the Eclipse.
-   2. Select "Import existing Maven project",
-   3. Import ```<path to J-Diagram>/J-Diagram/converter```
-   4. Right-click on the project.
-   5. Select "Export" > "Java" >> "Runnable JAR file" and click Next button.
-
+1. Make a runnable .jar file
+   1. Import https://github.com/OH318/J-Diagram.git using the Eclipse.
+   2. Right-click on the project.
+   3. Select "Export" > "Java" >> "Runnable JAR file" and click Next button.
+   4. Finish the process
+2. Execute .jar file
+   ```bash
+   java -jar <runnable .jar path> <java src dir path> <.drawio file path> 0|1
+   # If the last argument is 0, extractor will be executed.
+   # If the last argument is 1, coder will be executed. 
+   ```
+* *We had a classpath-related problem with one of the dependencies when we used Maven build in VSCode. So we chose to create the .jar file in Eclipse as an alternative. As soon as we find a solution, we will change it to using Maven build.*
 
 ## Contact
 * [kimseoye15@gmail.com](kimseoye15@gmail.com)
 * [audwns392@naver.com](audwns392@naver.com)
 * [qpalzmm22@gmail.com](qpalzmm22@gmai.com)
 * [sam1783@naver.com](sam1783@naver.com)
-
+* [jiniljeil1@naver.com](jiniljeil1@naver.com)
 
