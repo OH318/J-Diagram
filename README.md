@@ -53,7 +53,7 @@ J-Diagram is a Visual Studio Code extension to help Java developers. This provid
    ```
 * *We had a classpath-related problem with one of the dependencies when we used Maven build in VSCode. So we chose to create the .jar file in Eclipse as an alternative. As soon as we find a solution, we will change it to using Maven build.*
 
-## Test J-Diagram
+## Testing J-Diagram
 
 * Test cases using J-Unit are in converter/src/test/java/com/handong/oh318
 * Test cases for integration testing are in converter/src/test/resource
