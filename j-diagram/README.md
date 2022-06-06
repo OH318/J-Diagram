@@ -20,7 +20,7 @@ J-Diagram is a Visual Studio Code extension to help Java developers. This provid
 
 ---
 
-![Demo Extractor](images/Extractor_Demo.gif)
+![Demo Extractor](https://github.com/OH318/J-Diagram/blob/main/j-diagram/images/Extractor_Demo.gif?raw=true)
  
 --- 
 - **Create Java sources from drawio diagram.**
@@ -32,7 +32,7 @@ J-Diagram is a Visual Studio Code extension to help Java developers. This provid
 
 ---
 
-![Demo Extractor](images/Coder_Demo.gif)
+![Demo Coder](https://github.com/OH318/J-Diagram/blob/main/j-diagram/images/Coder_demo.gif?raw=true)
 
 ---
 
