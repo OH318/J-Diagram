@@ -5,6 +5,7 @@ public class Car {
 	private boolean engineOn;
 	private static boolean sideMirrorOn;
 	private static boolean lightOn;
+	private EngineType engineType;
 	public static final int DIRECTION = 7;
 
 	public void startEngine();

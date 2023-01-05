@@ -6,7 +6,7 @@
 
   <groupId>com.handong.oh318</groupId>
   <artifactId>converter</artifactId>
-  <version>0.0-SNAPSHOT</version>
+  <version>0.1-SNAPSHOT</version>
 
   <name>converter</name>
   <!-- FIXME change it to the project's website -->
@@ -16,7 +16,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
-    <version.roaster>2.24.0.Final</version.roaster>
+    <version.roaster>2.28.0.Final</version.roaster>
   </properties>
 
   <dependencies>
