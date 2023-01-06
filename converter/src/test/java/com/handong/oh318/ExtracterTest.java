@@ -26,7 +26,7 @@ public class ExtracterTest {
         try {
             ArrayList<Path> paths = (ArrayList<Path>) extractor.getJavaFilepaths(extractor.getDirectoryPath()) ;
             
-            assertEquals(paths.size(), 6);
+            assertEquals(paths.size(), 7);
 
             for (int i = 0 ; i < paths.size(); i++) {
                 assertThat(paths.get(i).toString()).endsWith(".java") ;

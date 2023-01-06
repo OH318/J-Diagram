@@ -31,6 +31,7 @@ import org.jboss.forge.roaster.model.source.FieldHolderSource;
 // JavaClassSource
 import org.jboss.forge.roaster.model.source.FieldSource;
 import org.jboss.forge.roaster.model.source.InterfaceCapableSource;
+import org.jboss.forge.roaster.model.source.JavaEnumSource;
 import org.jboss.forge.roaster.model.source.JavaSource;
 import org.jboss.forge.roaster.model.source.MethodHolderSource;
 import org.jboss.forge.roaster.model.source.MethodSource;
@@ -373,24 +374,19 @@ public class Extractor<O extends JavaSource<O>> extends UserInput {
 
         addmxGeometry(classNameBox, classbox.getX(), classbox.getY(), classbox.getWidth(), classbox.getHeight()) ;
 
-        // Draw a EnumConstantsBox // TODO
+        // Draw a EnumConstantsBox
         int y = classbox.getFieldboxInfo().getY();
-        if(classbox.getJavaSource() instanceof FieldHolderSource) {
-            FieldHolderSource<O> fhs = (FieldHolderSource<O>) classbox.getJavaSource();
-            List<FieldSource<O>> fieldList = fhs.getFields() ;
-            for (FieldSource<O> field : fieldList) {
-                drawField(field, classID, y, classbox.getWidth());
+        if(classbox.getJavaSource() instanceof JavaEnumSource) {
+            JavaEnumSource jes = (JavaEnumSource) classbox.getJavaSource();
+            List<EnumConstantSource> enumConstants = jes.getEnumConstants();
+            for (EnumConstantSource constant : enumConstants) {
+                drawEnumConstant(constant, classID, y, classbox.getWidth());
                 y +=26;
             }
         }
 
-        // Draw a SeperatorLine
-        drawSeperatorLine(classID, y, classbox.getWidth());
-        y += 8;
-
         // Draw a AttributesBox
-        int y = classbox.getFieldboxInfo().getY();
-        if(classbox.getJavaSource() instanceof FieldHolderSource) {
+        else if(classbox.getJavaSource() instanceof FieldHolderSource) {
             FieldHolderSource<O> fhs = (FieldHolderSource<O>) classbox.getJavaSource();
             List<FieldSource<O>> fieldList = fhs.getFields() ;
             for (FieldSource<O> field : fieldList) {
