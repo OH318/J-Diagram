@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.handong.oh318.ExtracterTest
--------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.597 s - in com.handong.oh318.ExtracterTest

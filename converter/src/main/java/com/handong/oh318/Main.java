@@ -3,6 +3,12 @@ package com.handong.oh318;
 public class Main {
     
     public static void main(String[] args) {
+
+        if (args.length != 3) {
+            System.out.println("Arguments: <Java Path> <Drawio Target File Path> <0 = extract, 1 = generate/code>");
+            System.exit(1);
+        }
+
         String javaPath = args[0] ; 
         String drawioPath = args[1] ; 
 
