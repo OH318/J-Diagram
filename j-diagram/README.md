@@ -48,7 +48,7 @@ J-Diagram is a Visual Studio Code extension to help Java developers. This provid
 
 If you have a bug or want to add other functionaity, please send email to us. 
 
-### 0.0.7
+### 0.0.9
 
-The version of 0.0.7 fix the bug that cannot execute on window.  
+This version fixed the bug that cannot execute on window.  
 Now, we provide service on window OS, mac OS, and linux environment.

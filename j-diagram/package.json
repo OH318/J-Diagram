@@ -2,7 +2,7 @@
   "name": "j-diagram",
   "displayName": "J-Diagram",
   "description": "J-Diagram is a Visual Studio Code extension to help Java developers. This provides a convenient conversion between the Java source code and the class diagram.",
-  "version": "0.0.7",
+  "version": "0.0.9",
   "engines": {
     "vscode": "^1.66.0"
   },
