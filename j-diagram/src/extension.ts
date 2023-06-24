@@ -81,8 +81,8 @@ export async function activate(context: vscode.ExtensionContext) {
 		} else if( selectDestiniationPath === 'Current Directoty'){
 			javaPath = './';
 		}
-
-		var command =  "java -jar " + JdjarPath + " " + javaPath + " " + drawioPath + " " + "1"; // 1 for Coder
+		
+		var command =  "java -jar \"" + JdjarPath + "\" \"" + javaPath + "\" \"" + drawioPath + "\" " + "1"; // 1 for Coder
 		console.log('command : ' + command);
 
 		exec(command, (err: any, stdout: any, stderr: any) => {
@@ -92,7 +92,6 @@ export async function activate(context: vscode.ExtensionContext) {
 			console.log(`stderr: ${stderr}`);
 			console.log(`stdout: ${stdout}`);
 		});
-
 	}));
 
 	context.subscriptions.push(commands.registerCommand('j-diagram.Source_to_Diagram', async () => {
@@ -148,7 +147,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			drawioPath = './';
 		}
 
-		var command =  "java -jar " + JdjarPath + " " + javaPath + " " + drawioPath + "/j-diagram.drawio " + "0"; // 0 for Extractor
+		var command =  "java -jar \"" + JdjarPath + "\" \"" + javaPath + "\" \"" + drawioPath + "/j-diagram.drawio\" " + "0"; // 0 for Extractor
 		console.log('command : ' + command);
 
 		await exec(command, (err: any, stdout: any, stderr: any) => {

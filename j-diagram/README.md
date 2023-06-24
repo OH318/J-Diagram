@@ -42,14 +42,13 @@ J-Diagram is a Visual Studio Code extension to help Java developers. This provid
 
 ## Known Issues
 
-- Some operating systems that doensn't have `/tmp` directory can't download j-d.jar 
+- Not found
 
 ## Release Notes
 
-This is the first release of the extension. This is to test if we could successfully upload 
+If you have a bug or want to add other functionaity, please send email to us. 
 
-### 0.0.6
+### 0.0.7
 
-
-Initial release of J-Diagram
-s
+The version of 0.0.7 fix the bug that cannot execute on window.  
+Now, we provide service on window OS, mac OS, and linux environment.
