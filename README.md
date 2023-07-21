@@ -11,7 +11,7 @@ J-Diagram is a Visual Studio Code extension to help Java developers. This provid
 * Java SE >= 8
 
 ## Supported Environments
-* Window OS, MacOS, Linux
+* Windows, MacOS, Linux
 
 ## Getting Started 
 
