@@ -63,5 +63,5 @@ J-Diagram is a Visual Studio Code extension to help Java developers. This provid
 * [audwns392@naver.com](audwns392@naver.com)
 * [qpalzmm22@gmail.com](qpalzmm22@gmail.com)
 * [sam1783@naver.com](sam1783@naver.com)
-* [jiniljeil1@naver.com](jiniljeil1@gmail.com)
+* [jiniljeil1@gmail.com](jiniljeil1@gmail.com)
 
